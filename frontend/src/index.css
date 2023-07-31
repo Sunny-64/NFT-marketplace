@@ -1,6 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --primary-dark : #19191D; 
+  --primary-bg : #343444; 
+  --primary-text : #fff;
+  --secondary : #79279F;
+}
+
+
 *{
   margin : 0; 
   padding : 0; 
   box-sizing: border-box;
+  color: var(--primary-text);
 }
 
+body{
+  background: var(--primary-dark);
+}
+
+#Header{
+  background: var(--primary-bg);
+  color: var(--primary-text);
+}
+
+html, body {
+  height: 100%; /* Set the height of the body to 100% */
+  margin: 0; /* Remove any default margin */
+  padding: 0; /* Remove any default padding */
+}
+#root {
+  display: flex; /* Use flexbox to control the layout */
+  flex-direction: column; /* Arrange the content in a column */
+  min-height: 100vh; /* Set the minimum height of the container to the viewport height */
+}
+
+footer {
+  margin-top: auto; /* Push the footer to the bottom of the container */
+}
+
+.btn-primary-border{
+  outline: 2px solid var(--secondary);
+}
+
+.btn-primary{
+  background-color: var(--secondary);
+}
+
+.btn-primary:hover{
+  background: none;
+  outline: 2px solid var(--secondary);
+}

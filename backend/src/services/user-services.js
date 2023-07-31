@@ -19,7 +19,19 @@ const createUser = async (userInfo) => {
     }
 }
 
-const getAllUsers = async () => {
+const findById = async(userId) => {
+    try{
+        const user = await User.findOne({_id : userId}); 
+        const userJson = user.toJSON(); 
+        delete userJson.password; 
+        return userJson; 
+    }
+    catch(err){
+        throw new Error(err); 
+    }
+}
+
+const findAllUsers = async () => {
     try{
         return await User.find(); 
     }
@@ -31,5 +43,6 @@ const getAllUsers = async () => {
 
 module.exports = {
     createUser,
-    getAllUsers
+    findAllUsers, 
+    findById,
 }; 

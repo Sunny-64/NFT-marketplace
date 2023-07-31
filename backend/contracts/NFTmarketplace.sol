@@ -22,6 +22,8 @@ contract Market is ERC721URIStorage, Ownable {
         string tokenURI; 
         uint price; 
         bool isSold; 
+        string name; 
+        string description; 
     }
 
     Token [] public tokens; 
@@ -30,7 +32,7 @@ contract Market is ERC721URIStorage, Ownable {
 
     constructor() ERC721("Marketplace", "MKP") {}
     
-    function mintNFT(string memory tokenURI, uint price) public returns (uint256){
+    function mintNFT(string memory tokenURI, uint price, string memory name, string memory description) public payable returns (uint256){
         require(price > 0, "Initial price should be greater than 0"); // sets the minimum price for the NFT
 
         uint256 newItemId = _tokenIds.current();
@@ -42,7 +44,9 @@ contract Market is ERC721URIStorage, Ownable {
             newItemId, 
             tokenURI, 
             price, 
-            false
+            false, 
+            name, 
+            description
         );
 
         tokens.push(newToken);
@@ -61,7 +65,9 @@ contract Market is ERC721URIStorage, Ownable {
         tokens[index].isSold = true; 
     }
 
-    function listNFT(uint index) public {
+    function listNFT(uint index, uint price) public {
+        // require(price > 0, "Price Should be Greater");
+        require(tokens[index].owner == msg.sender, "Only Owner can list their NFT");
         listings.push(tokens[index]);
     }
 

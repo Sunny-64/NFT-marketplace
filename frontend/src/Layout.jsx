@@ -7,8 +7,10 @@ function Layout() {
   return (
    <>
         <Header />
-        <Outlet />
-        <Footer />
+        <div className='main'>
+          <Outlet />
+        </div>
+        {/* <Footer /> */}
    </>
   )
 }
