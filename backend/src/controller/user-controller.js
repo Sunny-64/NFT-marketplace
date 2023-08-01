@@ -78,7 +78,11 @@ const getUsers = async (req, res) => {
 
 const getSingleUserWithId = async (req, res) => {
     try{
-        const {uid} = req.params; 
+        const {uid} = req.params;
+        if(!uid){
+            return res.status(400).json({success : false, message : "Invalid userId"}); 
+        }
+        // console.log(uid); 
         return res.status(200).json({success : true, message : "User fetched", data : await findById(uid)}); 
     }   
     catch(err){

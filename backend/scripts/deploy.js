@@ -28,5 +28,4 @@ const deployContract = async () => {
     provider.engine.stop(); 
 }
 
-
 deployContract(); 

@@ -1,10 +1,13 @@
 const router = require("express").Router(); 
-const {getAllNFTs, addNFT} = require("./../controller/nft-controller"); 
+const {getAllListedNfts, addNFT, getAllNfts, getUserNFTs} = require("./../controller/nft-controller"); 
 
-router.get("/", getAllNFTs); 
+router.get("/", getAllNfts);
+router.get("/listed", getAllListedNfts); 
 
 router.use(require("./../middlewares/auth")); 
-router.get("/add", addNFT); 
+
+router.post("/add", addNFT); 
+router.get("/user", getUserNFTs); 
 
 
 module.exports = router; 

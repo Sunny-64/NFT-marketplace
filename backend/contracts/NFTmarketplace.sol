@@ -24,15 +24,14 @@ contract Market is ERC721URIStorage, Ownable {
         bool isSold; 
         string name; 
         string description; 
+        bool isListedForSale; 
     }
 
     Token [] public tokens; 
 
-    Token [] public listings; 
-
-    constructor() ERC721("Marketplace", "MKP") {}
+    constructor() ERC721("Market_Place", "MKP") {}
     
-    function mintNFT(string memory tokenURI, uint price, string memory name, string memory description) public payable returns (uint256){
+    function mintNFT(string memory tokenURI, uint price, string memory name, string memory description) public  returns (uint256){
         require(price > 0, "Initial price should be greater than 0"); // sets the minimum price for the NFT
 
         uint256 newItemId = _tokenIds.current();
@@ -46,7 +45,8 @@ contract Market is ERC721URIStorage, Ownable {
             price, 
             false, 
             name, 
-            description
+            description, 
+            false
         );
 
         tokens.push(newToken);
@@ -55,27 +55,24 @@ contract Market is ERC721URIStorage, Ownable {
     }
 
     function purchaseNFT (uint index) public payable {
-        require(index < 0 || index >= tokens.length, "invalid index"); 
+        require(index >= 0 || index < tokens.length, "invalid index"); 
         require(msg.value == tokens[index].price, "Insufficient amount"); 
         require(!tokens[index].isSold, "Token already sold"); 
+        require(msg.sender != tokens[index].owner, "Owner can't purchase their own NFT");
+
         address prevOwner = tokens[index].owner; 
         tokens[index].owner = msg.sender; 
 
         _transfer(prevOwner, msg.sender, tokens[index].tokenId);
         tokens[index].isSold = true; 
+        tokens[index].isListedForSale = false; 
     }
 
-    function listNFT(uint index, uint price) public {
-        // require(price > 0, "Price Should be Greater");
-        require(tokens[index].owner == msg.sender, "Only Owner can list their NFT");
-        listings.push(tokens[index]);
+    function listNFT(uint index) public {
+        tokens[index].isListedForSale = true; 
     }
 
     function viewAllTokens() public view returns(Token [] memory){
         return tokens; 
-    }
-
-    function getAllListings() public view returns (Token [] memory){
-        return listings; 
     }
 }

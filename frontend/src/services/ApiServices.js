@@ -14,6 +14,10 @@ class APIServices{
         return axios.get(`${BASE_URL}/nfts`); 
     }
 
+    fetchListedNfts(){
+        return axios.get(`${BASE_URL}/nfts/listed`); 
+    }
+
     register(data){
         console.log(data);
         return axios.post(`${BASE_URL}/users/register`, data); 
@@ -29,7 +33,13 @@ class APIServices{
         return axios.get(`${BASE_URL}/users/${data}`, {headers : HEADERS}); 
     }
 
-    // saveNFT()
+    addNFT(data){
+        return axios.post(`${BASE_URL}/nfts/add`, data, {headers : HEADERS}); 
+    }
+
+    getUserNFTs(){
+        return axios.get(`${BASE_URL}/nfts/user`, {headers : HEADERS}); 
+    }
 }
 
 

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose"); 
 
 const NFTSchema = new mongoose.Schema({
-    userId : {type : mongoose.Schema.Types.ObjectId}, 
+    userId : {type : String}, 
     tokenId : {type : Number}, 
     tokenName : {type : String}, 
     tokenURI : {type : String}, 
@@ -11,6 +11,12 @@ const NFTSchema = new mongoose.Schema({
     // prevPricing : [], later
     // prevOwners : [], 
     isListed : {type : Boolean, default : false}, 
+    ownerAddress : {type : String},
+    blockHash : {type : String}, 
+    blockNumber : {type : Number},
+    transactionHash : {type : String},
+    transactionIndex : {type : Number},
+    gasUsed : {type : String},
     createdAt : {type : Date, default : Date.now()}, 
 }); 
 

@@ -17,19 +17,25 @@ function User() {
 
   useEffect(() => {
     const fetchData = async () => {
-        const fetchAccounts = await web3.eth.getAccounts(); 
+        // const fetchAccounts = await web3.eth.getAccounts(); 
         const response = await ApiService.getUser(sessionStorage.getItem("UID")); 
-        const fetchNfts = await ApiService.fetchNFTs(); 
+        // const fetchNfts = await ApiService.fetchNFTs(); 
+        // console.log(fetchNfts);
+        // const allNfts = fetchNfts.data.data?.map((items) => items.split(",")); 
+        // console.log(allNfts);
+        // const nfts = allNfts.filter((item, index) => item[0] === fetchAccounts[0]); 
 
-        const allNfts = fetchNfts.data.data?.map((items) => items.split(",")); 
-        // console.log(userNfts);
-        const nfts = allNfts.filter((item, index) => item[0] === fetchAccounts[0]); 
-
-        setUserNfts(nfts); 
+        // setUserNfts(nfts); 
+        // console.log(userNfts)
         if(response.status !== 200){
           return toast.error(response.data.error); 
         }
         setUserData(response.data.data); 
+
+        const nfts = await ApiService.getUserNFTs(); 
+        console.log(nfts);
+        setUserNfts(nfts.data.data); 
+
     }
 
     fetchData(); 
@@ -97,20 +103,20 @@ function User() {
           <p className='bg-[#000] px-3 py-2 inline-block rounded-md'>{userData?.mobile}</p>
       </section>
 
-      <div className='mt-8 grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 px-4'>
+      <div className='mt-8 grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 px-4 '>
           {userNfts?.map((item, index) => {
               return (
-                  <div key={index} className='card bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F]'>
+                  <div key={index} className='card bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6'>
                       {/* <p className='break-words'>Owner: {item[0]}</p> */}
-                      <p>name : {item[5]}</p>
-                      <p className='break-words'>Description : {item[6]}</p>
-                      <img src={item[2]} className='w-full rounded-md my-3' alt=''/>
+                      <p>name : {item.tokenName}</p>
+                      <p className='break-words'>Description : {item.tokenDescription}</p>
+                      <img src={item.tokenURI} className='w-full rounded-md my-3' alt=''/>
                       <div className='flex justify-between'>
-                        <p>Item Id : {item[1]}</p>
-                        <p>Price : {item[3]}</p>
+                        <p>Item Id : {item.tokenId}</p>
+                        <p>Price : {item.price}</p>
                       </div>
                       <div className='flex justify-between items-center mt-3'>
-                        <p>Sold : {item[4]}</p>
+                        <p>Sold : {item.isSold.toString()}</p>
                         <button className='py-2 rounded-md btn-primary px-3' onClick={() => sellNft(index)}>Sell</button>
                       </div>
                   </div>
