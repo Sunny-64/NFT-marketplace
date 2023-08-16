@@ -37,8 +37,8 @@ class APIServices{
         return axios.post(`${BASE_URL}/nfts/add`, data, {headers : HEADERS}); 
     }
 
-    getUserNFTs(){
-        return axios.get(`${BASE_URL}/nfts/user`, {headers : HEADERS}); 
+    getUserNFTs(publicKey){
+        return axios.get(`${BASE_URL}/nfts/user/${publicKey}`, {headers : HEADERS}); 
     }
 }
 

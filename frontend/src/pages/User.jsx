@@ -17,27 +17,21 @@ function User() {
 
   useEffect(() => {
     const fetchData = async () => {
-        // const fetchAccounts = await web3.eth.getAccounts(); 
+        const fetchAccounts = await web3.eth.getAccounts(); 
         const response = await ApiService.getUser(sessionStorage.getItem("UID")); 
-        // const fetchNfts = await ApiService.fetchNFTs(); 
-        // console.log(fetchNfts);
-        // const allNfts = fetchNfts.data.data?.map((items) => items.split(",")); 
-        // console.log(allNfts);
-        // const nfts = allNfts.filter((item, index) => item[0] === fetchAccounts[0]); 
-
-        // setUserNfts(nfts); 
-        // console.log(userNfts)
         if(response.status !== 200){
           return toast.error(response.data.error); 
         }
         setUserData(response.data.data); 
 
-        const nfts = await ApiService.getUserNFTs(); 
-        console.log(nfts);
+        if(!web3){
+          return; 
+        }
+        
+        const nfts = await ApiService.getUserNFTs(fetchAccounts[0]); 
+        console.log("NFTss : ", nfts);
         setUserNfts(nfts.data.data); 
-
     }
-
     fetchData(); 
   }, []); 
 
@@ -108,12 +102,12 @@ function User() {
               return (
                   <div key={index} className='card bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6'>
                       {/* <p className='break-words'>Owner: {item[0]}</p> */}
-                      <p>name : {item.tokenName}</p>
-                      <p className='break-words'>Description : {item.tokenDescription}</p>
-                      <img src={item.tokenURI} className='w-full rounded-md my-3' alt=''/>
+                      <p>name : {item.name}</p>
+                      <p className='break-words'>Description : {item.description}</p>
+                      <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt=''/>
                       <div className='flex justify-between'>
                         <p>Item Id : {item.tokenId}</p>
-                        <p>Price : {item.price}</p>
+                        <p>Price : {web3.utils.fromWei(item.price, "ether")}</p>
                       </div>
                       <div className='flex justify-between items-center mt-3'>
                         <p>Sold : {item.isSold.toString()}</p>

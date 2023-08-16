@@ -89,13 +89,13 @@ function NFTs() {
             <>
               <div key={index} className='card bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] mb-6'>
                 {/* <p className='break-words'>Owner: {item[0]}</p> */}
-                <p className='break-words'>Owner : {item[0]}</p>
+                {/* <p className='break-words'>Owner : {item[0]}</p> */}
                 <p>name : {item[5]}</p>
                 <p className='break-words'>Description : {item[6]}</p>
-                <img src={item[2]} className='w-full rounded-md my-3' alt='' />
+                <img src={item[2]} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
                 <div className='flex justify-between'>
                   <p>Item Id : {item[1]}</p>
-                  <p>Price : {item[3]}</p>
+                  <p>Price : {web3.utils.fromWei(item[3], "ether")}</p>
                 </div>
                 <div className='flex justify-between items-center mt-3'>
                   <p>Sold : {item[4].toString()}</p>

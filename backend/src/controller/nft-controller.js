@@ -115,7 +115,7 @@ const addNFT = async (req, res) => {
 const getUserNFTs = async (req, res) => {
     try{
         // console.log(req.user._id);
-        const data = await findUserNFTs(req.user._id); 
+        const data = await findUserNFTs(req.params.publicKey); 
         // console.log(data);
         res.status(200).json({success : true, data : data, message : "success"}); 
     }

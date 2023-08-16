@@ -4,6 +4,12 @@ const bcrypt = require("bcrypt");
 const createUser = async (userInfo) => {
     const {username, email, password, mobile} = userInfo; 
     try{
+        const checkIfUserExists = await User.findOne({email : email}); 
+
+        if(checkIfUserExists){
+            throw new Error(`User With the ${email} already exists`); 
+        }
+        
         const newUser = new User({
             username, 
             email, 

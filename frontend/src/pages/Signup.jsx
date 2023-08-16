@@ -26,7 +26,7 @@ function Signup() {
             // console.log(response);
             if(response.status !== 200){
                 // console.log("Registration failed"); 
-                return toast(`Failed to Sign up ${response.data.error}`)
+                return toast(`Failed to Sign up ${response.data.error ?? response.data.message}`)
             }
             toast('🦄 Registered Successfully. \n Redirecting to Login page'); 
             const data = {

@@ -7,7 +7,7 @@ router.get("/listed", getAllListedNfts);
 router.use(require("./../middlewares/auth")); 
 
 router.post("/add", addNFT); 
-router.get("/user", getUserNFTs); 
+router.get("/user/:publicKey", getUserNFTs); 
 
 
 module.exports = router; 

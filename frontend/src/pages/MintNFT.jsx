@@ -49,7 +49,7 @@ function MintNFT() {
             const accounts = await web3.eth.getAccounts();
             console.log(contract);
 
-            const executeMint = await contract.methods.mintNFT(imageDownloadUrl, price, name, description)
+            const executeMint = await contract.methods.mintNFT(imageDownloadUrl, web3.utils.toWei(price), name, description)
                 .send({
                     from: accounts[0]
                 });
@@ -61,7 +61,7 @@ function MintNFT() {
                 tokenName : name, 
                 tokenURI : imageDownloadUrl, 
                 tokenDescription : description, 
-                price : price, 
+                price : web3.utils.toWei(price), 
                 isSold : false, 
                 isListed : false, 
 
@@ -141,7 +141,7 @@ function MintNFT() {
                             <input type="text" id='description' name='description' className='py-2 rounded-md text-black px-4' required value={description} onChange={(e) => setDescription(e.target.value)} />
                         </div>
                         <div className='flex flex-col mb-3'>
-                            <label htmlFor="price">Price</label>
+                            <label htmlFor="price">Price (in ETH)</label>
                             <input type="number" name='price' id='price' className='py-2 rounded-md text-black px-4' required value={price} onChange={(e) => setPrice(e.target.value)} />
                         </div>
                         <div className='mb-3 flex flex-col content-start'>
