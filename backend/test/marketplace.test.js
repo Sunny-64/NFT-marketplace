@@ -155,5 +155,9 @@ describe("Test Market place", () => {
         // console.log("auctions : ", auctions);
         assert.equal(accounts[0], auctions[0].creator); 
     })
+
+    it("Should Revert the bidder his amount if someone places a higher bid", async () => {
+        
+    })
 });
 
