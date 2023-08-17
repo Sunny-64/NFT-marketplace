@@ -24,7 +24,7 @@ function Header() {
                 {sessionStorage.getItem("isLoggedIn")  ? 
                   <li><button className='btn-primary px-3 py-2 rounded-md flex items-center' onClick={logout}>Logout</button></li> 
                   : 
-                  <li><Link className='btn-primary px-3 py-2 rounded-md flex items-center' to={"/login"}>Login</Link></li> 
+                  <li><Link className='btn-primary px-3 py-2 rounded-md flex items-center' to={"/signup"}>Signup</Link></li> 
                 }
             </ul>
         </nav>

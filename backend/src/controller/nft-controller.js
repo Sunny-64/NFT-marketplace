@@ -3,6 +3,7 @@ const {
   saveMintedNFT,
   findAllNfts,
   findUserNFTs,
+  findAllAuctions,
 } = require("./../services/nft-services");
 
 const getAllListedNfts = async (req, res) => {
@@ -47,16 +48,14 @@ const addNFT = async (req, res) => {
     tokenId,
     tokenURI,
     tokenDescription,
-    price,
-    isListed,
-    isSold,
 
     ownerAddress,
-    blockHash,
-    blockNumber,
-    transactionHash,
-    transactionIndex,
-    gasUsed,
+    category
+    // blockHash,
+    // blockNumber,
+    // transactionHash,
+    // transactionIndex,
+    // gasUsed,
 
   } = req.body;
 //   console.log("token name : ", tokenName);
@@ -79,7 +78,7 @@ const addNFT = async (req, res) => {
       tokenId &&
       tokenURI &&
       tokenDescription &&
-      price
+      category
     )
   ) {
     return res.status(400).json({ success: false, message: "Invalid data" });
@@ -91,16 +90,13 @@ const addNFT = async (req, res) => {
       tokenDescription,
       tokenId,
       tokenURI,
-      price,
-      isSold,
-      isListed,
-
       ownerAddress,
-      blockHash,
-      blockNumber,
-      transactionHash,
-      transactionIndex,
-      gasUsed,
+      category
+      // blockHash,
+      // blockNumber,
+      // transactionHash,
+      // transactionIndex,
+      // gasUsed,
     };
     const saveNft = await saveMintedNFT(data);
     return res.status(200).json({ success: true, message: "NFT SAVED" });
@@ -124,9 +120,23 @@ const getUserNFTs = async (req, res) => {
     }
 }
 
+const getAllAuctions = async (req, res) => {
+    try{
+        const auctions = await findAllAuctions(); 
+        if(!auctions){
+          return res.status(400).json({message : "Couldn't fetch the data"}); 
+        }
+        return res.status(200).json({message : "fetched auctions", data : auctions}); 
+    }
+    catch(err){
+      return res.status(500).json({success : false, message : err.message}); 
+    }
+}
+
 module.exports = {
   getAllListedNfts,
   addNFT,
   getAllNfts,
   getUserNFTs,
+  getAllAuctions, 
 };

@@ -21,6 +21,11 @@ body{
   background: var(--primary-dark);
 }
 
+.modal form{
+  background-color: var(--primary-bg);
+  
+}
+
 #Header{
   background: var(--primary-bg);
   color: var(--primary-text);

@@ -21,16 +21,34 @@ const findAllNfts = async () => {
 
 const findListedNfts = async () => {
   try {
-    let tokens = await contractInstance.methods.viewAllTokens().call();
-    let result = tokens.map((token) => token.toString());
-    // console.log("Result : ", typeof result[0]);
-    let itemArr = result.map((item) => item.toString().split(","));
-    let listedNft = itemArr.filter((item) => item[item.length - 1] === "true");
-    // console.log("Listed : ", listedNft);
+    let tokens = await contractInstance.methods.NFTsForSale().call();
     if (!tokens) {
       throw new Error("Error while fetching NFTS");
     }
-    return listedNft;
+    // console.log(tokens[0]);
+    let listedTokens = []; 
+    tokens.forEach(token => {
+        let tokenObj = {
+          owner : token.owner.toString(), 
+          tokenId : Number(token.tokenId),
+          tokenURI : token.tokenURI.toString(), 
+          price : Number(token.price), 
+          name : token.name.toString(), 
+          description : token.description.toString(), 
+          category : token.category.toString(), 
+          isListedForSale : token.isListedForSale.toString(),
+          isListedForAuction : token.isListedForAuction.toString()
+        }
+         listedTokens.push(tokenObj); 
+    });
+    // let result = tokens.map((token) => token.toString());
+    // // console.log("Result : ", result);
+    // let itemArr = result.map((item) => item.toString().split(","));
+    // // console.log(itemArr)
+    // let listedNft = itemArr.filter((item) => item[item.length - 2] === "true");
+    // console.log("Listed : ", listedNft);
+   
+    return listedTokens;
   } catch (err) {
     throw new Error(err.message);
   }
@@ -43,16 +61,16 @@ const saveMintedNFT = async (data) => {
     tokenURI,
     userId,
     tokenDescription,
-    price,
-    isListed,
-    isSold,
+    // isListed,
+    // isSold,
 
     ownerAddress,
-    blockHash,
-    blockNumber,
-    transactionHash,
-    transactionIndex,
-    gasUsed,
+    category, 
+    // blockHash,
+    // blockNumber,
+    // transactionHash,
+    // transactionIndex,
+    // gasUsed,
   } = data;
   try {
     const newNft = new NFT({
@@ -61,16 +79,17 @@ const saveMintedNFT = async (data) => {
       tokenName,
       tokenURI,
       tokenDescription,
-      price,
-      isSold,
-      isListed,
+      category, 
+      // price,
+      // isSold,
+      // isListed,
 
       ownerAddress,
-      blockHash,
-      blockNumber,
-      transactionHash,
-      transactionIndex,
-      gasUsed,
+      // blockHash,
+      // blockNumber,
+      // transactionHash,
+      // transactionIndex,
+      // gasUsed,
     });
 
     const saveNft = await newNft.save();
@@ -115,9 +134,22 @@ const findUserNFTs = async (publicKey) => {
   }
 };
 
+const findAllAuctions = async () => {
+    try{
+        const auctionedNFTs = await contractInstance.methods.getAllAuctions().call(); 
+        console.log(auctionedNFTs);
+        return auctionedNFTs; 
+    }
+    catch(err){
+        console.log(err);
+        throw new Error(err); 
+    }
+}
+
 module.exports = {
   findListedNfts,
   saveMintedNFT,
   findAllNfts,
   findUserNFTs,
+  findAllAuctions,
 };

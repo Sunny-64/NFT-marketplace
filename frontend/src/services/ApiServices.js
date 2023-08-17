@@ -40,6 +40,10 @@ class APIServices{
     getUserNFTs(publicKey){
         return axios.get(`${BASE_URL}/nfts/user/${publicKey}`, {headers : HEADERS}); 
     }
+
+    fetchAuctions(){
+        return axios.get(`${BASE_URL}/nfts/auctions`); 
+    }
 }
 
 

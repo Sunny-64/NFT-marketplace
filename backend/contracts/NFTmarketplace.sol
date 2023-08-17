@@ -20,6 +20,7 @@ contract Market is ERC721URIStorage, Ownable {
         uint price; 
         string name; 
         string description; 
+        string category;
         bool isListedForSale; 
         bool isListedForAuction; 
     }
@@ -50,7 +51,7 @@ contract Market is ERC721URIStorage, Ownable {
     constructor() ERC721("Market_Place", "MKP") {}
     
     // function mintNFT(string memory tokenURI, uint price, string memory name, string memory description) public  returns (uint256){
-    function mintNFT(string memory tokenURI, string memory name, string memory description) public  returns (uint256){
+    function mintNFT(string memory tokenURI, string memory name, string memory description, string memory category) public  returns (uint256){
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
@@ -61,6 +62,7 @@ contract Market is ERC721URIStorage, Ownable {
             0,
             name, 
             description, 
+            category,
             false, 
             false
         );

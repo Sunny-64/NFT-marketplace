@@ -14,18 +14,24 @@ const web3 = new Web3(provider);
 
 const deployContract = async () => {
     console.log("Attempting to deploy....")
-    const accounts = await web3.eth.getAccounts();
-    const result = await new web3.eth.Contract(ABI.abi)
-    .deploy({
-        data : ABI.bytecode
-    })
-    .send({
-        from : accounts[0], 
-        gas : "5000000"
-    }); 
+   try{
+        const accounts = await web3.eth.getAccounts();
+        const result = await new web3.eth.Contract(ABI.abi)
+        .deploy({
+            data : ABI.bytecode
+        })
+        .send({
+            from : accounts[0], 
+            gas : "10000000"
+        }); 
 
-    console.log("Contract deployed to : ", result.options.address); 
-    provider.engine.stop(); 
+        console.log("Contract deployed to : ", result.options.address); 
+        provider.engine.stop(); 
+   }
+   catch(err){
+        console.log(err);
+        provider.engine.stop(); 
+   }
 }
 
 deployContract(); 
