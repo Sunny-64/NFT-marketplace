@@ -7,7 +7,10 @@ import { initContract } from "./../scripts/contract";
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ApiService from './../services/ApiServices'; 
+import ApiService from './../services/ApiServices';
+
+import { CSSProperties } from "react";
+import MoonLoader from "react-spinners/MoonLoader";
 
 function MintNFT() {
     const navigate = useNavigate();
@@ -17,6 +20,8 @@ function MintNFT() {
     const [image, setImage] = useState();
     // const [imageDownloadUrl, setImageDownloadUrl] = useState(""); 
     const [contract, setContract] = useState("");
+    let [loading, setLoading] = useState(false);
+
 
     let imageName;
 
@@ -27,10 +32,11 @@ function MintNFT() {
         e.preventDefault();
         try {
             // Upload image to firebase and get the image url...
+
             if (!image) {
                 return;
             }
-
+            setLoading(true); 
             imageName = (uuidv4() + "." + image.type.split("/")[1]);
 
             const storageRef = ref(storage, `images/${imageName}`);
@@ -38,7 +44,8 @@ function MintNFT() {
             console.log("Image uploaded to firebase...");
 
             const imageDownloadUrl = await getDownloadURL(ref(storage, `images/${imageName}/`));
-
+            setLoading(false); 
+            toast.success("Creating NFT"); 
             // make request to blockchain for minting the NFT.
             // console.log("Image Download URL : ",imageDownloadUrl);
 
@@ -47,23 +54,24 @@ function MintNFT() {
             console.log(contract);
 
             const executeMint = await contract.methods.mintNFT(imageDownloadUrl, name, description, category)
-            .send({
-                from: accounts[0]
-            });
+                .send({
+                    from: accounts[0]
+                });
 
             console.log('result : ', executeMint);
+            toast.success("Transaction successful"); 
 
             const data = {
-                tokenId : Number(executeMint.logs[1].data),
-                tokenName : name, 
-                tokenURI : imageDownloadUrl, 
-                tokenDescription : description, 
+                tokenId: Number(executeMint.logs[1].data),
+                tokenName: name,
+                tokenURI: imageDownloadUrl,
+                tokenDescription: description,
                 // price : web3.utils.toWei(price), 
                 // isSold : false, 
                 // isListed : false, 
 
-                ownerAddress  : accounts[0], 
-                category : category
+                ownerAddress: accounts[0],
+                category: category
                 // blockHash : executeMint.blockHash.toString(), 
                 // blockNumber : Number(executeMint.blockNumber), 
                 // transactionHash : executeMint.transactionHash.toString(), 
@@ -71,13 +79,13 @@ function MintNFT() {
                 // gasUsed : Number(executeMint.gasUsed)
             }
 
-            console.log("Data to be sent to the server : ",data); 
-            const saveNFTData = await ApiService.addNFT(data); 
+            console.log("Data to be sent to the server : ", data);
+            const saveNFTData = await ApiService.addNFT(data);
             // console.log("Data to be sent to the server ",data);
-            if(saveNFTData.status === 200){
+            if (saveNFTData.status === 200) {
                 console.log("NFT SAVED...");
             }
-            else{
+            else {
                 console.log("NFT not saved")
             }
         }
@@ -111,8 +119,28 @@ function MintNFT() {
         }
     }, []);
 
+    const override = {
+        margin: "0 auto",
+        borderColor: "blue",
+        position: "absolute",
+        // width : "", 
+        top: "50%",
+        marginLeft: "auto",
+        display: "block",
+    };
+
     return (
         <>
+            <div className='relative w-full flex justify-center'>
+                <MoonLoader
+                    color={"#ffffff"}
+                    loading={loading}
+                    cssOverride={override}
+                    size={60}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                />
+            </div>
             <ToastContainer
                 position="top-right"
                 autoClose={5000}

@@ -81,7 +81,7 @@ contract Market is ERC721URIStorage, Ownable {
         return tokens.length - 1;
     }
 
-    function purchaseNFT (uint index) public payable notListedForSale(index) notListedForAuction(index){
+    function purchaseNFT (uint index) public payable notListedForAuction(index){
         // require(msg.sender != tokens[index].owner, "Owner can't purchase their own NFT");
         require(index >= 0 || index < tokens.length, "invalid index"); 
         require(msg.value >= tokens[index].price, "Insufficient amount"); 

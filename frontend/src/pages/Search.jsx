@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react'
 import web3 from './../scripts/web3'
 import { initContract } from "./../scripts/contract";
 import ApiService from '../services/ApiServices';
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import { CSSProperties } from "react";
+import MoonLoader from "react-spinners/MoonLoader";
 
 function Search() {
   const [nfts, setNfts] = useState([]); 
@@ -11,6 +15,7 @@ function Search() {
 
   const [categories, setCategories] = useState([]); 
   const [name, setName] = useState(""); 
+  let [loading, setLoading] = useState(false);
 
   useEffect(() => {
     initContract()
@@ -31,9 +36,11 @@ function Search() {
 
       const fetchData = async () => {
         // fetch categories
+        setLoading(true); 
         const fetchCategories = await ApiService.getCategories(); 
         console.log(fetchCategories.data.data);
         setCategories(fetchCategories.data.data); 
+        setLoading(false); 
       }
 
       fetchData(); 
@@ -42,9 +49,11 @@ function Search() {
   console.log(categories);
 
   const filterByCategory = async (category) =>{
+      setLoading(true); 
       const data = await ApiService.searchByCategory(category); 
       console.log(data);
       setNfts(data.data.data);
+      setLoading(false)
   }
 
   const purchaseNFT = async (index, price) => {
@@ -52,17 +61,16 @@ function Search() {
       return toast.error("You have to login to purchase the NFT");
     }
     try {
+      setLoading(true); 
       const accounts = await web3.eth.getAccounts();
-      console.log(contract);
-      console.log("Index",index);
-      console.log("price : ",price);
-      console.log(accounts);
+     
       const purchase = await contract.methods.purchaseNFT(index).send({
         from: accounts[0],
         value: price
       });
       
       console.log("tx", purchase);
+      setLoading(false);
     }
     catch (err) {
       console.log(err);
@@ -74,14 +82,35 @@ function Search() {
       if(name.trim() === ""){
         return; 
       }
-
+      setLoading(true); 
       const data = await ApiService.searchByName(name); 
-      // console.log(data);
+      console.log(data);
       setNfts(data.data.data); 
+      setLoading(false); 
   }
+  const override = {
+    margin: "0 auto",
+    borderColor: "blue",
+    position: "absolute",
+    // width : "", 
+    top: "40%",
+    left : "45%",
+    marginLeft: "auto",
+    display: "block",
+  };
   return (
 
     <>
+     {/* <div className='relative w-full flex justify-center z-100'> */}
+        <MoonLoader
+          color={"#ffffff"}
+          loading={loading}
+          cssOverride={override}
+          size={60}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      {/* </div> */}
     <ToastContainer
         position="top-right"
         autoClose={5000}
