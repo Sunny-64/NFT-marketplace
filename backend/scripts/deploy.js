@@ -25,13 +25,19 @@ const deployContract = async () => {
             gas : "10000000"
         }); 
 
+        console.log("deployed..");
         console.log("Contract deployed to : ", result.options.address); 
         provider.engine.stop(); 
    }
    catch(err){
         console.log(err);
-        provider.engine.stop(); 
+        provider.engine.stop(); //
    }
 }
 
-deployContract(); 
+deployContract()
+.then(() => {
+    console.log("deployed");
+}).catch(err => {
+    console.log(err);
+})

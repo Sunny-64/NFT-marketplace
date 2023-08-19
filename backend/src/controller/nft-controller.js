@@ -4,6 +4,9 @@ const {
   findAllNfts,
   findUserNFTs,
   findAllAuctions,
+  searchNFTByName, 
+  getAllCategories, 
+  searchByCategory, 
 } = require("./../services/nft-services");
 
 const getAllListedNfts = async (req, res) => {
@@ -48,29 +51,10 @@ const addNFT = async (req, res) => {
     tokenId,
     tokenURI,
     tokenDescription,
-
     ownerAddress,
     category
-    // blockHash,
-    // blockNumber,
-    // transactionHash,
-    // transactionIndex,
-    // gasUsed,
-
   } = req.body;
-//   console.log("token name : ", tokenName);
-//   console.log("token tokenId : ", tokenId);
-//   console.log("token tokenURI : ", tokenURI);
-//   console.log("token tokenDescription : ", tokenDescription);
-//   console.log("token price : ", price);
-//   console.log("token isListed : ", isListed);
-//   console.log("token isSold : ", isSold);
-//   console.log("token isSold : ", ownerAddress);
-//   console.log("token isSold : ", blockHash);
-//   console.log("token isSold : ", blockNumber);
-//   console.log("token isSold : ", transactionHash);
-//   console.log("token isSold : ", transactionIndex);
-//   console.log("token isSold : ", gasUsed);
+
   const userId = req.user._id;
   if (
     !(
@@ -133,10 +117,50 @@ const getAllAuctions = async (req, res) => {
     }
 }
 
+const getNFTByName = async (req, res) =>{
+  const {name} = req.params; 
+  try{
+      const nft = await searchNFTByName(name); 
+      return res.status(200).json({success : true, data : nft}); 
+  }
+  catch(err){
+    console.log(err);
+    return res.status(500).json({success : false, message : err.message}); 
+  }
+}
+
+const getNFTCategories = async (req, res) => {
+  try{
+    const categories = await getAllCategories(); 
+    return res.status(200).json({success : true, data : categories}); 
+  }
+  catch(err){
+    return res.status(500).json({success : false, message : err.message}); 
+  }
+}
+
+const getNFTByCategory = async (req, res) => {
+  const {category} = req.params; 
+  try{
+    const nft = await searchByCategory(category); 
+    return res
+    .status(200)
+    .json({success : true, data : nft}); 
+  }
+  catch(err){
+    return res
+    .status(500)
+    .json({success : false, message : err.message}); 
+  }
+}
+ 
 module.exports = {
   getAllListedNfts,
   addNFT,
   getAllNfts,
   getUserNFTs,
   getAllAuctions, 
+  getNFTByName,
+  getNFTCategories, 
+  getNFTByCategory,
 };

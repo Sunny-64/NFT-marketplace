@@ -82,7 +82,7 @@ function NFTs() {
         pauseOnHover
         theme="dark"
       />
-      NFTs
+      {nfts?.length > 0 ? NFTs : <p>No NFT's has been listed For sale yet..</p>}
       <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1'>
         {nfts?.map((item, index) => {
           {/* console.log(item) */}

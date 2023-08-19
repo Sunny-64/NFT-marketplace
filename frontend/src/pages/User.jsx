@@ -15,8 +15,8 @@ function User() {
   const [userNfts, setUserNfts] = useState(); 
   const [contract, setContract] = useState(""); 
   const [toggleAuctionForm, setToggleAuctionForm] = useState(""); 
-  const [auctionStartingPrice, setAuctionStartingPrice] = useState(""); 
-  const [auctionDuration, setAuctionDuration] = useState(""); 
+  const [auctionStartingPrice, setAuctionStartingPrice] = useState(0); 
+  const [auctionDuration, setAuctionDuration] = useState(0); 
   const [auctionIndex, setAuctionIndex] = useState(""); 
 
   useEffect(() => {
@@ -89,8 +89,37 @@ function User() {
   }
 
   const handleInitiateAuction = async (e) => {
-      e.preventDefault(); 
-      // make auction request to blockchain now.... 
+    e.preventDefault(); 
+    try{
+      const fetchAccounts = await web3.eth.getAccounts(); 
+      
+      let auctionDurationInSeconds = Number(auctionDuration) * 3600; 
+      let auctionPriceInWei = web3.utils.toWei(String(auctionStartingPrice), 'ether'); 
+    
+      const startAuction = await contract.methods.startAuction(auctionPriceInWei, auctionDurationInSeconds, auctionIndex).send({
+          from: fetchAccounts[0]
+      }); 
+      console.log(startAuction);
+    }
+    catch(err){
+      console.log(err);
+      return; 
+    }
+  }
+
+  const handleFinalizeAuction = async (index) => {
+      let confirm = window.confirm("Are you sure you want to end the auction"); 
+      if(!confirm){
+        return; 
+      } 
+
+      const accounts = await web3.eth.getAccounts(); 
+
+      let finalize = await contract.methods.finalizeAuction(index).send({
+          from : accounts[0]
+      }); 
+
+      console.log("finalized : ", finalize);
   }
 
   return (
@@ -149,12 +178,17 @@ function User() {
                       <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt=''/>
                       <div className='flex justify-between'>
                         {/* <p>Item Id : {item.tokenId}</p> */}
-                        <p>Price : {Number(web3.utils.fromWei(item.price, "ether"))}</p>
+                        {Boolean(item?.isListedForSale) && <p>Price : {web3.utils.fromWei(item.price, "ether")} ETH</p>}
+                        <p>{Boolean(item?.isListedForAuction)}</p>
+                        {/* {Boolean(item?.isListedForAuction) && <p>Highest Bid : {web3.utils.fromWei(item.highestBid, "ether")}</p>} */}
                       </div>
                       <div className='flex justify-between items-center mt-3'>
                         {/* <p>Sold : {item.isSold.toString()}</p> */}
+                        
+                        {Boolean(item?.isListedForAuction) ? <button className='py-2 rounded-md btn-primary px-3' onClick={() => handleFinalizeAuction(index)}>Finalize Auction</button> : 
                         <button className='py-2 rounded-md btn-primary px-3' onClick={() => handleAuction(index)}>Auction</button>
-                        <button className='py-2 rounded-md btn-primary px-5' onClick={() => sellNft(index)}>Sell</button>
+                        }
+                        {Boolean(!item?.isListedForSale) && <button className='py-2 rounded-md btn-primary px-5' onClick={() => sellNft(index)}>Sell</button>}
                       </div>
                   </div>
               )

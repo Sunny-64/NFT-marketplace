@@ -13,6 +13,7 @@ import Home from './pages/Home';
 import MintNFT from './pages/MintNFT';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
+import Search from './pages/Search';
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path : "/profile",
         element : <User />
+      },
+      {
+        path : "/search",
+        element : <Search />
       }
     ],
   },

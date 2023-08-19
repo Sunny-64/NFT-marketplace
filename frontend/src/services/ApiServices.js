@@ -44,6 +44,18 @@ class APIServices{
     fetchAuctions(){
         return axios.get(`${BASE_URL}/nfts/auctions`); 
     }
+
+    searchByName(){
+        return axios.get(`${BASE_URL}/nfts/search/`); 
+    }
+
+    getCategories(){
+        return axios.get(`${BASE_URL}/nfts/categories`); 
+    }
+
+    searchByCategory(){
+        return axios.get(`${BASE_URL}/nfts/categories`); 
+    }
 }
 
 

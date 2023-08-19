@@ -18,6 +18,7 @@ function Header() {
             <h3 className='col-span-1 text-xl font-bold brand self-center'><Link to={"/"}>NFT Marketplace</Link></h3>
             <ul className='flex gap-8 col-span-2 justify-end px-8 items-center'>
                 <li><Link to={"/"}>Home</Link></li>
+                <li><Link to={"/search"}>Search</Link></li>
                 {/* {sessionStorage.getItem("isLoggedIn") && <li><Link to={"/mint"}>Mint NFT</Link></li>} */}
                 <li><Link to={"/mint"}>Mint NFT</Link></li>
                 {sessionStorage.getItem("isLoggedIn") && <li><Link to={"/profile"}>Profile</Link></li>}
