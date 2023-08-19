@@ -45,16 +45,16 @@ class APIServices{
         return axios.get(`${BASE_URL}/nfts/auctions`); 
     }
 
-    searchByName(){
-        return axios.get(`${BASE_URL}/nfts/search/`); 
+    searchByName(name){
+        return axios.get(`${BASE_URL}/nfts/search/${name}`); 
     }
 
     getCategories(){
         return axios.get(`${BASE_URL}/nfts/categories`); 
     }
 
-    searchByCategory(){
-        return axios.get(`${BASE_URL}/nfts/categories`); 
+    searchByCategory(category){
+        return axios.get(`${BASE_URL}/nfts/categories/${category}`); 
     }
 }
 
