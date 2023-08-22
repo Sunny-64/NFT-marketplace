@@ -199,6 +199,7 @@ const saveTxHistory = async (req, res) => {
 const getNFTByTokenId = async(req, res) => {
   const {id} = req.params; 
   try{
+    console.log(id);
     const nftData = await findByTokenId(id); 
     return res.status(200).json({success : true, data : nftData}); 
   }

@@ -129,14 +129,33 @@ const findUserNFTs = async (publicKey) => {
       
       if (item.isListedForAuction) {
         const auctionTokens = await contractInstance.methods.getAllAuctions().call();
-        const auction = auctionTokens.find(auctionItem => parseInt(auctionItem.tokenIndex) === parseInt(item.tokenId));
+        // console.log(auctionTokens);
+        // const auction = auctionTokens.find(auctionItem => parseInt(auctionItem.tokenIndex) === parseInt(item.tokenId));
+        let auction = []; 
+        auctionTokens.forEach((auctionItem, index) => {
+          // console.log(auctionItem);
+          // console.log(auctionItem.tokenIndex == item.tokenId);
+            if(auctionItem.tokenIndex == item.tokenId){
+                // console.log("inside the if");
+                let aucObj =  {
+                  highestBid : parseInt(auctionItem?.highestBid), 
+                  startingPrice : parseInt(auctionItem?.startingPrice), 
+                  index : index
+                 }
+                //  console.log(aucObj);
+
+                 auction.push(aucObj); 
+            }
+        }); 
+
         // console.log(auction);
         obj = {
           owner: item.owner.toString(),
           tokenId: parseInt(item.tokenId),
           tokenURI: item.tokenURI.toString(),
-          highestBid: parseInt(auction.highestBid),
-          startingPrice: parseInt(auction.startingPrice),
+          highestBid: parseInt(auction[0].highestBid),
+          startingPrice: parseInt(auction[0].startingPrice),
+          auctionIndex: parseInt(auction[0].index),
           name: item.name.toString(),
           description: item.description.toString(),
           category: item.category.toString(),
@@ -185,10 +204,11 @@ const findAllAuctions = async () => {
         const auctionedNFTs = await contractInstance.methods.getAllAuctions().call(); 
         const serializedAuctionedNFTs = []; 
 
-        auctionedNFTs.forEach((item) => {
+        auctionedNFTs.forEach((item, index) => {
             const auctionedTokenDetails = nftsListedForAuction.filter(t => t.tokenId == item.tokenIndex); 
             // console.log(auctionedTokenDetails[0]);
             let obj = {
+              auctionIndex : index, 
               tokenName : auctionedTokenDetails[0].name, 
               tokenDescription : auctionedTokenDetails[0].description, 
               category : auctionedTokenDetails[0].category, 
@@ -293,8 +313,11 @@ const txHistory = async (data) => {
 const findByTokenId = async (id) => {
   try{
     const auctionedNFTs = await contractInstance.methods.getAllAuctions().call(); 
-    // console.log(auctionedNFTs);
-    const auctionWithId = auctionedNFTs.filter(item => parseInt(item.tokenIndex) == parseInt(id)); 
+    // console.log(auctionedNFTs[0]);
+    const auctionWithId = auctionedNFTs.filter((item, index) => {
+      // console.log(item.tokenIndex, id, parseInt(item.tokenIndex) == parseInt(id));
+      return index === parseInt(id)
+    }); 
     // console.log(auctionWithId);
     let obj = {
       tokenIndex : Number(auctionWithId[0].tokenIndex), 
@@ -336,5 +359,5 @@ module.exports = {
   nftLikeDislike, 
   txHistory,
   findByTokenId, 
-  viewUserTxHistory
+  viewUserTxHistory,
 };
