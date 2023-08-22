@@ -1,6 +1,4 @@
 // SPDX-License-Identifier: MIT
-//Contract based on [https://docs.openzeppelin.com/contracts/3.x/erc721](https://docs.openzeppelin.com/contracts/3.x/erc721)
-
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -9,158 +7,130 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract Market is ERC721URIStorage, Ownable {
-
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
+   event NFTMinted(address indexed owner, uint indexed tokenId, string tokenURI, string name, string description, string category);
+
     struct Token {
-        address payable owner; 
-        uint tokenId; 
-        string tokenURI; 
-        uint price; 
-        string name; 
-        string description; 
+        address payable owner;
+        uint tokenId;
+        string tokenURI;
+        uint price;
+        string name;
+        string description;
         string category;
-        bool isListedForSale; 
-        bool isListedForAuction; 
+        bool isListedForSale;
+        bool isListedForAuction;
     }
 
-    struct Auction{
-        uint tokenIndex; 
-        uint startingPrice; 
-        address payable creator; 
-        uint endTime; 
-        uint highestBid; 
-        address highestBidder; 
+    struct Auction {
+        uint tokenIndex;
+        uint startingPrice;
+        address payable creator;
+        uint endTime;
+        uint highestBid;
+        address highestBidder;
     }
 
-    Token [] public tokens; 
-    Auction [] auctions; 
+    Token[] public tokens;
+    Auction[] public auctions;
 
-    modifier onlyTokenOwner(uint i){
-        require(msg.sender == tokens[i].owner); 
-        _; 
-    }
-
-    modifier onlyAuctionOwner(uint i){
-        require(msg.sender == auctions[i].creator);
-        _; 
-    }
-
-    modifier notListedForSale(uint index){
-        require(!tokens[index].isListedForSale, "Already listed for sale"); 
+    modifier onlyTokenOwner(uint index) {
+        require(msg.sender == tokens[index].owner, "Not the token owner");
         _;
     }
-    
-    modifier notListedForAuction(uint index){
-        require(!tokens[index].isListedForAuction, "Already Listed for Auction");
-        _; 
+
+    modifier onlyAuctionOwner(uint index) {
+        require(msg.sender == auctions[index].creator, "Not the auction owner");
+        _;
+    }
+
+    modifier notListedForSale(uint index) {
+        require(!tokens[index].isListedForSale, "Already listed for sale");
+        _;
+    }
+
+    modifier notListedForAuction(uint index) {
+        require(!tokens[index].isListedForAuction, "Already listed for auction");
+        _;
     }
 
     constructor() ERC721("Market_Place", "MKP") {}
-    
-    // function mintNFT(string memory tokenURI, uint price, string memory name, string memory description) public  returns (uint256){
-    function mintNFT(string memory tokenURI, string memory name, string memory description, string memory category) public  returns (uint256){
+
+    function mintNFT(string memory tokenURI, string memory name, string memory description, string memory category) public returns (uint256) {
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
         Token memory newToken = Token(
-            payable(msg.sender), 
-            newItemId, 
-            tokenURI, 
+            payable(msg.sender),
+            newItemId,
+            tokenURI,
             0,
-            name, 
-            description, 
+            name,
+            description,
             category,
-            false, 
+            false,
             false
         );
 
         tokens.push(newToken);
         _tokenIds.increment();
+
+        emit NFTMinted(msg.sender, newItemId, tokenURI, name, description, category);
         return tokens.length - 1;
     }
 
-    function purchaseNFT (uint index) public payable notListedForAuction(index){
-        // require(msg.sender != tokens[index].owner, "Owner can't purchase their own NFT");
-        require(index >= 0 || index < tokens.length, "invalid index"); 
-        require(msg.value >= tokens[index].price, "Insufficient amount"); 
-
-        address prevOwner = tokens[index].owner; 
-        payable(prevOwner).transfer(msg.value);
-
-        tokens[index].owner = payable(msg.sender); 
-
-        _transfer(prevOwner, msg.sender, tokens[index].tokenId);
-
-        tokens[index].isListedForAuction = false; 
-        tokens[index].isListedForSale = false; 
-        tokens[index].price = msg.value;
-    }
-
-    function sellNFT(uint index, uint price) public onlyTokenOwner(index) notListedForSale(index) notListedForAuction(index){ // turn it into sell NFT function 
-        require(price > 0, "Price should be greater than zero"); 
-
-        tokens[index].price = price; 
-        tokens[index].isListedForSale = true; 
-    }
-
-    function removeFromSale(uint index) public onlyTokenOwner(index) notListedForSale(index){
-        // require(!tokens[index].isListedForSale, "Already Not Listed For sale..");
-        tokens[index].isListedForSale = false; 
-    }
-
-    function viewAllTokens() public view returns(Token [] memory){ // shouldn't be avaialbe to users.
+    function viewAllTokens() public view returns(Token [] memory){
         return tokens; 
     }
 
-    function NFTsForSale() public view returns (Token[] memory) {
-        Token[] memory listedNFTs = new Token[](tokens.length); // Maximum possible size
+    function purchaseNFT(uint index) public payable notListedForAuction(index) {
+        Token storage token = tokens[index];
+        require(index < tokens.length, "Invalid index");
+        require(msg.value >= token.price, "Insufficient amount");
 
-        uint numListedNFTs = 0;
-        for (uint i = 0; i < tokens.length; i++) {
-            if (tokens[i].isListedForSale) {
-                listedNFTs[numListedNFTs] = tokens[i];
-                numListedNFTs++;
-            }
-        }
+        address payable prevOwner = token.owner;
+        token.owner = payable(msg.sender);
+        token.isListedForAuction = false;
+        token.isListedForSale = false;
+        token.price = msg.value;
 
-        // Resize the array to the actual number of listed NFTs
-        assembly {
-            mstore(listedNFTs, numListedNFTs)
-        }
-
-        return listedNFTs;
+        _transfer(prevOwner, msg.sender, token.tokenId);
+        prevOwner.transfer(msg.value);
     }
 
-    // auction initiation...
-    function startAuction(uint startingPrice, uint durationInSeconds, uint index) public onlyTokenOwner(index) notListedForSale(index) notListedForAuction(index){ // duration will be in hours..
-        // require(tokens[index].owner == msg.sender, "Only the owner can auction the NFT");
-      
-        Auction memory startNewAuction; 
-        startNewAuction.creator = payable(msg.sender); 
-        startNewAuction.endTime = block.timestamp + durationInSeconds; 
-        startNewAuction.highestBid = 0;
-        startNewAuction.highestBidder = address(0); 
-        startNewAuction.startingPrice = startingPrice; 
-        startNewAuction.tokenIndex = index;  
-        tokens[index].isListedForAuction = true; 
-        // adds the auction to auctions array..
-        auctions.push(startNewAuction);
+    function sellNFT(uint index, uint price) public onlyTokenOwner(index) notListedForSale(index) notListedForAuction(index) {
+        require(price > 0, "Price should be greater than zero");
 
+        tokens[index].price = price;
+        tokens[index].isListedForSale = true;
     }
 
-    function getAllAuctions() public view returns(Auction [] memory){
+    function removeFromSale(uint index) public onlyTokenOwner(index) notListedForSale(index) {
+        tokens[index].isListedForSale = false;
+    }
+
+    // Auction related functions...
+
+    function startAuction(uint startingPrice, uint durationInSeconds, uint index) public notListedForSale(index) notListedForAuction(index) {
+        Auction memory newAuction = Auction(
+            index,
+            startingPrice,
+            payable(msg.sender),
+            block.timestamp + durationInSeconds,
+            0,
+            address(0)
+        );
+        tokens[index].isListedForAuction = true;
+        auctions.push(newAuction);
+    }
+
+    function getAllAuctions() public view returns (Auction[] memory) {
         return auctions;
     }
 
-    function removeAuction(uint i) public {
-        tokens[auctions[i].tokenIndex].isListedForAuction = false; 
-        auctions[i] = auctions[auctions.length - 1]; 
-        auctions.pop(); 
-    }
-
-    function bidOnAuction(uint auctionIndex) public payable {
+     function bidOnAuction(uint auctionIndex) public payable {
         require(auctions[auctionIndex].creator != msg.sender, "Owners cannot bid on their own NFT");
         require(msg.value > auctions[auctionIndex].highestBid, "Bid must be higher than the previous bid"); 
         require(block.timestamp < auctions[auctionIndex].endTime, "Auction has ended"); 
@@ -174,24 +144,29 @@ contract Market is ERC721URIStorage, Ownable {
         auctions[auctionIndex].highestBidder = msg.sender; 
     }
 
-    function finalizeAuction(uint auctionIndex) public payable onlyAuctionOwner(auctionIndex){
+     function finalizeAuction(uint auctionIndex) public payable onlyAuctionOwner(auctionIndex){
 
-        require(auctions[auctionIndex].highestBid > 0, "No one has bid on the auction");
+        // require(auctions[auctionIndex].highestBid > 0, "No one has bid on the auction");
+        if(auctions[auctionIndex].highestBid <= 0){
+            auctions[auctionIndex] = auctions[auctions.length - 1]; 
+            auctions.pop(); 
+        }
+        else{
+            address prevOwner = auctions[auctionIndex].creator; 
 
-        address prevOwner = auctions[auctionIndex].creator; 
+            // transfer the ownership
+            transferFrom(prevOwner, auctions[auctionIndex].highestBidder, tokens[auctions[auctionIndex].tokenIndex].tokenId);
 
-        // transfer the ownership
-        transferFrom(prevOwner, auctions[auctionIndex].highestBidder, tokens[auctions[auctionIndex].tokenIndex].tokenId);
+            // change the owner details 
+            tokens[auctions[auctionIndex].tokenIndex].owner = payable(auctions[auctionIndex].highestBidder); 
+            tokens[auctions[auctionIndex].tokenIndex].price = auctions[auctionIndex].highestBid; 
+            tokens[auctions[auctionIndex].tokenIndex].isListedForAuction = false; 
 
-        // change the owner details 
-        tokens[auctions[auctionIndex].tokenIndex].owner = payable(auctions[auctionIndex].highestBidder); 
-        tokens[auctions[auctionIndex].tokenIndex].price = auctions[auctionIndex].highestBid; 
-        tokens[auctions[auctionIndex].tokenIndex].isListedForAuction = false; 
+            payable(auctions[auctionIndex].creator).transfer(auctions[auctionIndex].highestBid);
 
-        payable(auctions[auctionIndex].creator).transfer(auctions[auctionIndex].highestBid);
-
-        // Remove the NFT from the auction
-        auctions[auctionIndex] = auctions[auctions.length - 1]; 
-        auctions.pop(); 
+            // Remove the NFT from the auction
+            auctions[auctionIndex] = auctions[auctions.length - 1]; 
+            auctions.pop(); 
+        }
     }
 }

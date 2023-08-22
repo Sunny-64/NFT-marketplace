@@ -2,6 +2,7 @@
 const contractInstance = require("../helpers/contract");
 const NFT = require("./../models/nft-model");
 const User = require("./../models/user-model");
+const Tx = require("./../models/transaction-history"); 
 
 
 async function getAuctionByTokenId(tokenId){
@@ -44,13 +45,15 @@ const findAllNfts = async () => {
 
 const findListedNfts = async () => {
   try {
-    let tokens = await contractInstance.methods.NFTsForSale().call();
+    let tokens = await contractInstance.methods.viewAllTokens().call();
+    // console.log(tokens);
+    let saleTokens = await tokens.filter(token => Boolean(token.isListedForSale)); 
     if (!tokens) {
       throw new Error("Error while fetching NFTS");
     }
     // console.log(tokens[0]);
     let listedTokens = []; 
-    tokens.forEach(token => {
+    saleTokens.forEach(token => {
         let tokenObj = {
           owner : token.owner.toString(), 
           tokenId : Number(token.tokenId),
@@ -118,15 +121,16 @@ const saveMintedNFT = async (data) => {
 const findUserNFTs = async (publicKey) => {
   try {
     let tokens = await contractInstance.methods.viewAllTokens().call();
-    let result = [];
+    // console.log(tokens);
+   
 
-    await Promise.all(tokens.map(async (item) => {
+    let result = tokens.map(async (item) => {
       let obj = {};
       
       if (item.isListedForAuction) {
         const auctionTokens = await contractInstance.methods.getAllAuctions().call();
         const auction = auctionTokens.find(auctionItem => parseInt(auctionItem.tokenIndex) === parseInt(item.tokenId));
-        
+        // console.log(auction);
         obj = {
           owner: item.owner.toString(),
           tokenId: parseInt(item.tokenId),
@@ -151,12 +155,17 @@ const findUserNFTs = async (publicKey) => {
           isListedForSale: item.isListedForSale,
           isListedForAuction: item.isListedForAuction
         };
+        // console.log(obj);
       }
-      
-      result.push(obj);
-    }));
-
-    let userNfts = result.filter((userNft) => userNft.owner === publicKey);
+      // console.log(obj);
+      // result.push(obj);
+      return obj; 
+      // console.log(result);
+    });
+    // console.log(result);
+    const resolvedData = await Promise.all(result); 
+    // console.log(resolvedData);
+    let userNfts = resolvedData.filter((userNft) => userNft.owner === publicKey);
     // console.log(userNfts);
 
     return userNfts;
@@ -221,8 +230,9 @@ const searchNFTByName = async(name) => {
 const getAllCategories = async () => {
     try{
       const nfts = await findAllNfts(); 
-      
-      const result = nfts.map(item => item.category); 
+      console.log(nfts);
+      const onlyListed = nfts.filter(item => (Boolean(item.isListedForAuction) || Boolean(item.isListedForSale))); 
+      const result = onlyListed.map(item => item.category); 
 
       // console.log(result);
       return result; 
@@ -236,7 +246,7 @@ const searchByCategory = async (category) => {
     try{
       const nfts = await findAllNfts(); 
       
-      const result = nfts.filter(item => item.category.toString().toLowerCase() == category.toLowerCase()); 
+      const result = nfts.filter(item => item.category.toString().toLowerCase() == category.toLowerCase() && (Boolean(item.isListedForSale || Boolean(item.isListedForAuction)))); 
 
       // console.log(result);
       return result; 
@@ -244,6 +254,74 @@ const searchByCategory = async (category) => {
     catch(err){
       throw new Error(err)
     }
+}
+
+const nftLikeDislike = async (userId, token) => {
+  const nfts = await findAllNfts(); 
+  const result = nfts.filter(item => item.tokenId == token.tokenId); 
+  console.log(result);
+
+  const doesNFTexists = await NFT.findOne({tokenId : result[0].tokenId}); 
+  if(!doesNFTexists){
+    throw new Error("there was an error"); 
+  }
+  // if(doesNFTexists.length <= 0){
+  //     const newNft = new NFT({
+
+  //     })
+  // }
+}
+
+
+
+const txHistory = async (data) => {
+    const {tokenId, transactionAmount, transactionType, userId} = data; 
+    try{
+
+      const newTx = new Tx(); 
+      newTx.tokenId = tokenId; 
+      newTx.transactionAmount = transactionAmount; 
+      newTx.transactionType = transactionType; 
+      newTx.userId = userId; 
+      await newTx.save(); 
+    } 
+    catch(err){
+      throw new Error(err)
+    }
+}
+
+const findByTokenId = async (id) => {
+  try{
+    const auctionedNFTs = await contractInstance.methods.getAllAuctions().call(); 
+    // console.log(auctionedNFTs);
+    const auctionWithId = auctionedNFTs.filter(item => parseInt(item.tokenIndex) == parseInt(id)); 
+    // console.log(auctionWithId);
+    let obj = {
+      tokenIndex : Number(auctionWithId[0].tokenIndex), 
+      startingPrice : Number(auctionWithId[0].startingPrice),
+      creator : auctionWithId[0].creator.toString(), 
+      endTime : Number(auctionWithId[0].endTime), 
+      highestBid : Number(auctionWithId[0].highestBid), 
+      highestBidder : auctionWithId[0].highestBidder.toString()
+    }
+    // console.log(obj);
+    return obj; 
+  }
+  catch(err){
+    throw new Error(err); 
+  }
+}
+
+const viewUserTxHistory = async (id) => {
+  try{
+    const txs = await Tx.find({userId : id}); 
+    return txs; 
+  }
+  catch(err){
+    console.log(err);
+    throw new Error(err); 
+  }
+  
 }
 
 module.exports = {
@@ -255,4 +333,8 @@ module.exports = {
   searchNFTByName,
   getAllCategories, 
   searchByCategory,
+  nftLikeDislike, 
+  txHistory,
+  findByTokenId, 
+  viewUserTxHistory
 };

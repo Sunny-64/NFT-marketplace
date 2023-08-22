@@ -9,7 +9,9 @@
   --secondary : #79279F;
 }
 
-
+.tx{
+  background: var(--secondary);
+}
 *{
   margin : 0; 
   padding : 0; 

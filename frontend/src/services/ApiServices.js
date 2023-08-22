@@ -10,10 +10,6 @@ const HEADERS = {
 
 class APIServices{
 
-    fetchNFTs(){
-        return axios.get(`${BASE_URL}/nfts`); 
-    }
-
     fetchListedNfts(){
         return axios.get(`${BASE_URL}/nfts/listed`); 
     }
@@ -55,6 +51,18 @@ class APIServices{
 
     searchByCategory(category){
         return axios.get(`${BASE_URL}/nfts/categories/${category}`); 
+    }
+
+    saveTx(data){
+        return axios.post(`${BASE_URL}/nfts/tx`, data, {headers : HEADERS});
+    }
+
+    getAuctionWithId(id){
+        return axios.get(`${BASE_URL}/nfts/auction/${id}`); 
+    }
+
+    getTxHistory(){
+        return axios.get(`${BASE_URL}/nfts/user/txs`, {headers : HEADERS}); 
     }
 }
 

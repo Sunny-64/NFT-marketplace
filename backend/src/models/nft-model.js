@@ -11,11 +11,6 @@ const NFTSchema = new mongoose.Schema({
     isListedForAuction : {type : Boolean, default : false}, 
     ownerAddress : {type : String},
     category : {type : String}, 
-    // blockHash : {type : String}, 
-    // blockNumber : {type : Number},
-    // transactionHash : {type : String},
-    // transactionIndex : {type : Number},
-    // gasUsed : {type : String},
     createdAt : {type : Date, default : Date.now()}, 
 }); 
 

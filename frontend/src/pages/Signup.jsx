@@ -47,7 +47,7 @@ function Signup() {
     <>
         <ToastContainer
             position="top-right"
-            autoClose={5000}
+            autoClose={2000}
             hideProgressBar={false}
             newestOnTop={false}
             closeOnClick
@@ -67,11 +67,11 @@ function Signup() {
                         </div>
                         <div className='flex flex-col mb-3'>
                             <label htmlFor="email">Email</label>
-                            <input type="text" id='email' name='email' className='py-2 rounded-md text-black px-4' required value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input type="text" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" id='email' name='email' className='py-2 rounded-md text-black px-4' required value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div className='flex flex-col mb-3'>
                             <label htmlFor="mobile">Mobile</label>
-                            <input type="text" name='mobile' id='mobile' className='py-2 rounded-md text-black px-4' required value={mobile} onChange={(e) => setMobile(e.target.value)}/>
+                            <input type="text" pattern="[789][0-9]{9}" name='mobile' id='mobile' className='py-2 rounded-md text-black px-4' required value={mobile} onChange={(e) => setMobile(e.target.value)}/>
                         </div>
                         <div className='mb-3 flex flex-col content-start'>
                             <label htmlFor="password">Password</label>

@@ -41,7 +41,7 @@ function Login() {
         <>
             <ToastContainer
                 position="top-right"
-                autoClose={5000}
+                autoClose={3000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick
@@ -58,7 +58,7 @@ function Login() {
                     <form action="" encType='multipart/form-data' className='md:w-[80%] sm:w-full' onSubmit={handleSubmit}>
                         <div className='flex flex-col mb-3'>
                             <label htmlFor="email">Email</label>
-                            <input type="text" id='email' name='email' className='py-2 rounded-md text-black px-4' required value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input type="text" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" id='email' name='email' className='py-2 rounded-md text-black px-4' required value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
 
                         <div className='mb-3 flex flex-col content-start'>

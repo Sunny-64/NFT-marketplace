@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import storage from './../scripts/firebase'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { v4 as uuidv4 } from 'uuid';
@@ -12,8 +12,12 @@ import ApiService from './../services/ApiServices';
 import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
 
+import { io } from "socket.io-client";
+
+
 function MintNFT() {
     const navigate = useNavigate();
+    const socket = useRef(); 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
@@ -45,54 +49,82 @@ function MintNFT() {
 
             const imageDownloadUrl = await getDownloadURL(ref(storage, `images/${imageName}/`));
             setLoading(false); 
-            toast.success("Creating NFT"); 
+            toast.success("NFT created... Confirming transaction"); 
             // make request to blockchain for minting the NFT.
             // console.log("Image Download URL : ",imageDownloadUrl);
 
             // get accounts  
             const accounts = await web3.eth.getAccounts();
             console.log(contract);
-
-            const executeMint = await contract.methods.mintNFT(imageDownloadUrl, name, description, category)
-                .send({
-                    from: accounts[0]
-                });
-
-            console.log('result : ', executeMint);
-            toast.success("Transaction successful"); 
-
-            const data = {
-                tokenId: Number(executeMint.logs[1].data),
-                tokenName: name,
-                tokenURI: imageDownloadUrl,
-                tokenDescription: description,
-                // price : web3.utils.toWei(price), 
-                // isSold : false, 
-                // isListed : false, 
-
-                ownerAddress: accounts[0],
-                category: category
-                // blockHash : executeMint.blockHash.toString(), 
-                // blockNumber : Number(executeMint.blockNumber), 
-                // transactionHash : executeMint.transactionHash.toString(), 
-                // transactionIndex : Number(executeMint.transactionIndex), 
-                // gasUsed : Number(executeMint.gasUsed)
-            }
-
-            console.log("Data to be sent to the server : ", data);
-            const saveNFTData = await ApiService.addNFT(data);
-            // console.log("Data to be sent to the server ",data);
-            if (saveNFTData.status === 200) {
-                console.log("NFT SAVED...");
-            }
-            else {
-                console.log("NFT not saved")
-            }
+            setLoading(true); 
+            // const gasPrice = web3.utils.toWei("0.01", "ether"); 
+            
+   
+            socket.current = io("http://localhost:3000", { transports: ["websocket"] });
+            
+            // socket.current.on("mint", async (m) => {
+                // console.log("Inside the socket"); 
+               await new Promise(async (resolve, reject) => {
+                    // console.log("promise executed...");
+                    try{
+                        const executeMint = await contract.methods.mintNFT(imageDownloadUrl, name, description, category)
+                        .send({
+                            from: accounts[0], 
+                            // gasPrice : gasPrice
+                        });
+                        console.log(executeMint);
+                        toast.success("Transaction successful"); 
+                        setLoading(false); 
+            
+                        const data = {
+                            tokenId: Number(executeMint.logs[1].data),
+                            tokenName: name,
+                            tokenURI: imageDownloadUrl,
+                            tokenDescription: description,
+                            ownerAddress: accounts[0],
+                            category: category
+                        }
+            
+                        console.log("Data to be sent to the server : ", data);
+                        const saveNFTData = await ApiService.addNFT(data);
+                        // console.log("Data to be sent to the server ",data);
+                        if (saveNFTData.status === 200) {
+                            console.log("NFT SAVED...");
+                        }
+                        else {
+                            console.log("NFT not saved")
+                            
+                        }
+                        console.log('result : ', executeMint);
+                        resolve(); 
+                    }   
+                    catch(err){
+                        reject(err.message);
+                    }
+                })
+            // })    
         }
         catch (err) {
             console.log(err)
         }
     }
+
+    // useEffect(() => {
+    //     contract.events.NFTMinted().on("data", d => {
+    //         console.log(d);
+    //     })
+    // }, [])
+    // console.log(contract.events.NFTMinted());
+    // console.log(contract?.events?.NFTMinted());
+    // useEffect(() => {
+    //     // const event = contract.events.NFTMinted(); 
+    //     // event.on("data", data => {
+    //     //     console.log(data);
+    //     // })
+    //     console.log(event);
+    // })
+
+
 
     useEffect(() => {
         initContract()

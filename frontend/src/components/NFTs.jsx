@@ -55,6 +55,9 @@ function NFTs() {
     if (!sessionStorage.getItem("isLoggedIn")) {
       return toast.error("You have to login to purchase the NFT");
     }
+    // if(price <= 0){
+    //   return window.alert("Invalid amount.."); 
+    // }
     try {
       const accounts = await web3.eth.getAccounts();
       console.log(contract);
@@ -62,6 +65,10 @@ function NFTs() {
       console.log("price : ", price);
       console.log(accounts);
       setLoading(true);
+
+      const saveTx = await APIService.saveTx({tokenId : index, transactionAmount : price, transactionType : "purchase"}); 
+      console.log(saveTx);
+
       const purchase = await contract.methods.purchaseNFT(index).send({
         from: accounts[0],
         value: price
@@ -112,7 +119,7 @@ function NFTs() {
 
 
       {nfts?.length > 0 ? NFTs : <p>No NFT's has been listed For sale yet..</p>}
-      <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1'>
+      <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 gap-3'>
         {nfts?.map((item, index) => {
           {/* console.log(item) */ }
           return (
@@ -129,7 +136,7 @@ function NFTs() {
                 </div>
                 <div className='flex justify-between items-center mt-3'>
                   <p>Category : {item.category}</p>
-                  <button className='py-2 rounded-md btn-primary px-3' onClick={() => purchaseNFT(index, item.price)}>Purchase</button>
+                  <button className='py-2 rounded-md btn-primary px-3' onClick={() => purchaseNFT(item.tokenId, item.price)}>Purchase</button>
                 </div>
               </div>
             </>

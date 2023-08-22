@@ -6,12 +6,18 @@ const {
   findAllAuctions,
   searchNFTByName, 
   getAllCategories, 
-  searchByCategory, 
+  searchByCategory,
+  txHistory, 
+  findByTokenId,
+  viewUserTxHistory
 } = require("./../services/nft-services");
+
+const NFT = require("./../models/nft-model"); 
 
 const getAllListedNfts = async (req, res) => {
   try {
     const nfts = await findListedNfts();
+    addNewNFTToDB(nfts); 
     return res.status(200).json({
       success: true,
       message: "NFTs fetched",
@@ -96,6 +102,7 @@ const getUserNFTs = async (req, res) => {
     try{
         // console.log(req.user._id);
         const data = await findUserNFTs(req.params.publicKey); 
+        addNewNFTToDB(data); 
         // console.log(data);
         res.status(200).json({success : true, data : data, message : "success"}); 
     }
@@ -153,7 +160,64 @@ const getNFTByCategory = async (req, res) => {
     .json({success : false, message : err.message}); 
   }
 }
+
+const addNewNFTToDB = async(data) => {
+  try{ 
+      const newNFTs = []; 
+      data.forEach(element => {
+        const doesNFTExist = NFT.findOne({tokenId : element.tokenId}); 
+        if(!doesNFTExist){
+          newNFTs.push(element); 
+        }
+        return;
+      }); 
+      
+      for(let i = 0; i<newNFTs.length; i++){
+        const n = new NFT(newNFTs[i]); 
+        await n.save(); 
+        console.log("nft saved");
+      }
+      return true; 
+  }
+  catch(err){
+    throw new Error(err); 
+  }
+}
  
+const saveTxHistory = async (req, res) => {
+  const {tokenId, transactionAmount, transactionType} = req.body; 
+  const userId = req.user._id;
+  try{
+    await txHistory({tokenId, transactionAmount, transactionType, userId}); 
+    return res.status(200).json({success : true, message : "tx saved"}); 
+  }
+  catch(err){
+    return res.status(500).json({success : false, error : err.message}); 
+  }
+}
+
+const getNFTByTokenId = async(req, res) => {
+  const {id} = req.params; 
+  try{
+    const nftData = await findByTokenId(id); 
+    return res.status(200).json({success : true, data : nftData}); 
+  }
+  catch(err){
+    console.log(err);
+    return res.status(500).json({success : false, error : err.message}); 
+  }
+}
+
+const getUserTxHistory = async (req, res) => {
+    try{
+        const txs = await viewUserTxHistory(req.user._id); 
+        return res.status(200).json({success : true, data : txs}); 
+    }
+    catch(err){
+        return res.status(500).json({success : false, error : err.message}); 
+    }
+}
+
 module.exports = {
   getAllListedNfts,
   addNFT,
@@ -163,4 +227,8 @@ module.exports = {
   getNFTByName,
   getNFTCategories, 
   getNFTByCategory,
+  addNewNFTToDB, 
+  saveTxHistory, 
+  getNFTByTokenId,
+  getUserTxHistory
 };

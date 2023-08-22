@@ -28,6 +28,9 @@ const createUser = async (userInfo) => {
 const findById = async(userId) => {
     try{
         const user = await User.findOne({_id : userId}); 
+        if(!user){
+            throw new Error("user not found"); 
+        }
         const userJson = user.toJSON(); 
         delete userJson.password; 
         return userJson; 

@@ -1,7 +1,7 @@
 const web3 = require("./web3"); 
 const path = require("path"); 
 
-const contractAddress = "0x5bA4f8a945842Cc01c58F071B35B09FFbFC21897"; 
+const contractAddress = "0xe26cb9acb83240fC7CC58ecDd75d821F2a390951"; 
 const ABI = require(path.resolve(__dirname, "../", "../", "artifacts", "contracts", "NFTmarketplace.sol", "Market.json")); 
 
 

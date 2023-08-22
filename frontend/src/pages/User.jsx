@@ -21,6 +21,7 @@ function User() {
   const [auctionStartingPrice, setAuctionStartingPrice] = useState(0);
   const [auctionDuration, setAuctionDuration] = useState(0);
   const [auctionIndex, setAuctionIndex] = useState("");
+  const [txs, setTxs] = useState([]);
   let [loading, setLoading] = useState(false);
 
 
@@ -36,11 +37,11 @@ function User() {
       if (!web3) {
         return;
       }
-      setLoading(true); 
+      setLoading(true);
       const nfts = await ApiService.getUserNFTs(fetchAccounts[0]);
       console.log("NFTss : ", nfts);
       setUserNfts(nfts.data.data);
-      setLoading(false); 
+      setLoading(false);
     }
     fetchData();
   }, []);
@@ -71,19 +72,23 @@ function User() {
 
     const price = prompt("Enter the Price for the NFT");
     try {
-      setLoading(true); 
+      setLoading(true);
       const getMetaMaskAccounts = await web3.eth.getAccounts();
       // console.log("Accounts : ", getMetaMaskAccounts);
       // console.log("contract", contract);
 
       console.log("price : ", price, typeof price,);
       console.log("Index : ", index, typeof index,);
+      console.log("acc : ", getMetaMaskAccounts[0],);
+
+      const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3.utils.toWei(price, "ether"), transactionType: "sell" });
+      console.log(saveTx);
 
       const listNft = await contract.methods.sellNFT(index, web3.utils.toWei(Number(price), "ether")).send({
         from: getMetaMaskAccounts[0]
       });
 
-      setLoading(false); 
+      setLoading(false);
       console.log("NFT is Now Listed For Sale : ", listNft);
     }
     catch (err) {
@@ -99,17 +104,19 @@ function User() {
   const handleInitiateAuction = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true); 
+      setLoading(true);
       const fetchAccounts = await web3.eth.getAccounts();
 
       let auctionDurationInSeconds = Number(auctionDuration) * 3600;
       let auctionPriceInWei = web3.utils.toWei(String(auctionStartingPrice), 'ether');
-
+      console.log(fetchAccounts[0]);
+      setToggleAuctionForm(!toggleAuctionForm);
+      setLoading(false);
       const startAuction = await contract.methods.startAuction(auctionPriceInWei, auctionDurationInSeconds, auctionIndex).send({
         from: fetchAccounts[0]
       });
+      toast.success("Transaction Successful");
       console.log(startAuction);
-      setLoading(false); 
     }
     catch (err) {
       console.log(err);
@@ -117,21 +124,41 @@ function User() {
     }
   }
 
-  const handleFinalizeAuction = async (index) => {
+  const calculateCountdown = (endTime) => {
+    const now = new Date().getTime();
+    const endTimestamp = endTime * 1000; // Convert seconds to milliseconds
+    const remainingTime = endTimestamp - now;
+    // console.log(remainingTime);
+    // if(remainingTime > 0)
+    return remainingTime
+  };
+
+  const handleFinalizeAuction = async (index, price) => {
+    const auctionDetails = await ApiService.getAuctionWithId(index);
+    // console.log(auctionDetails);
+    const auctionTime = calculateCountdown(auctionDetails.endTime);
+    // console.log(auctionTime);
+    if (auctionTime > 0) {
+      return window.alert("You can not finalize the auction yet.");
+    }
     let confirm = window.confirm("Are you sure you want to end the auction");
     if (!confirm) {
       return;
     }
-    setLoading(true); 
+    setLoading(true);
     const accounts = await web3.eth.getAccounts();
 
+    const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "sell" });
+    console.log(saveTx);
     let finalize = await contract.methods.finalizeAuction(index).send({
       from: accounts[0]
     });
 
+    // save transaction history..
     console.log("finalized : ", finalize);
-    setLoading(false); 
+    setLoading(false);
   }
+
 
   const override = {
     margin: "0 auto",
@@ -143,7 +170,17 @@ function User() {
     display: "block",
   };
 
-
+  useEffect(() => {
+    // fetch user transactions...
+    const fetchData = async () => {
+      setLoading(true);
+      const fetchTxs = await ApiService.getTxHistory();
+      setLoading(false);
+      console.log(fetchTxs.data.data);
+      setTxs(fetchTxs.data.data);
+    }
+    fetchData();
+  }, [])
   return (
     <>
       <ToastContainer
@@ -201,10 +238,10 @@ function User() {
 
       }
 
-      <div className='mt-8 grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 px-4 '>
+      <div className='mt-8 grid lg:grid-cols-4 gap-3 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 px-4 '>
         {userNfts?.map((item, index) => {
           return (
-            <div key={index} className='card bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6'>
+            <div key={index} className='card col-span-1 bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6'>
               {/* <p className='break-words'>Owner: {item[0]}</p> */}
               <p>name : {item.name}</p>
               <p className='break-words'>Description : {item.description}</p>
@@ -219,15 +256,31 @@ function User() {
               <div className='flex justify-between items-center mt-3'>
                 {/* <p>Sold : {item.isSold.toString()}</p> */}
 
-                {Boolean(item?.isListedForAuction) ? <button className='py-2 rounded-md btn-primary px-3' onClick={() => handleFinalizeAuction(index)}>Finalize Auction</button> :
-                  <button className='py-2 rounded-md btn-primary px-3' onClick={() => handleAuction(index)}>Auction</button>
+                {Boolean(item?.isListedForAuction) ? <button className='py-2 rounded-md btn-primary px-3' onClick={() => handleFinalizeAuction(item.tokenId, item.price)}>Finalize Auction</button> :
+                  Boolean(!item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-3' onClick={() => handleAuction(item.tokenId)}>Auction</button>
                 }
-                {Boolean(!item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-5' onClick={() => sellNft(index)}>Sell</button>}
+                {Boolean(!item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-5' onClick={() => sellNft(item.tokenId)}>Sell</button>}
               </div>
             </div>
           )
         })}
       </div>
+
+      <section id='tx' className='my-16 px-4'>
+      <h3 className='text-3xl font-semibold text-center mb-2'>Transactions</h3>
+      <hr className='mb-8' />
+      <div className='grid grid-cols-2 gap-4'>
+        {txs?.map((item, key) => {
+            return (
+              <div className='gap-10 tx py-2 px-4 inline-flex rounded-lg col-span-1'>
+                <p>Token Id : {item.tokenId}</p>
+                <p>Transaction Amount : {web3.utils.fromWei(item.transactionAmount, "ether")} ETH</p>
+                <p>Transaction Type : {item.transactionType}</p>
+              </div>
+            )
+          })}
+      </div>
+      </section>
     </>
   )
 }
