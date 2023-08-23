@@ -125,7 +125,7 @@ function NFTs() {
           return (
             <>
               <div key={index} className='card bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] mb-6'>
-                {/* <p className='break-words'>Owner: {item[0]}</p> */}
+                {/* <p className='break-words'>Owner: {item.owner}</p> */}
                 {/* <p className='break-words'>Owner : {item[0]}</p> */}
                 <p>name : {item.name}</p>
                 <p className='break-words'>Description : {item.description}</p>

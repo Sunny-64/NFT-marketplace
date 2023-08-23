@@ -7,6 +7,7 @@ import { initContract } from "./../scripts/contract";
 
 import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
+import Countdown from '../components/Countdown';
 
 function User() {
   const navigate = useNavigate();
@@ -74,8 +75,6 @@ function User() {
     try {
       setLoading(true);
       const getMetaMaskAccounts = await web3.eth.getAccounts();
-      // console.log("Accounts : ", getMetaMaskAccounts);
-      // console.log("contract", contract);
 
       console.log("price : ", price, typeof price,);
       console.log("Index : ", index, typeof index,);
@@ -97,8 +96,8 @@ function User() {
   }
 
   const handleAuction = async (index) => {
-    setToggleAuctionForm(!toggleAuctionForm);
     setAuctionIndex(index);
+    setToggleAuctionForm(!toggleAuctionForm);
   }
 
   const handleInitiateAuction = async (e) => {
@@ -106,17 +105,19 @@ function User() {
     try {
       setLoading(true);
       const fetchAccounts = await web3.eth.getAccounts();
-
       let auctionDurationInSeconds = Number(auctionDuration) * 3600;
-      let auctionPriceInWei = web3.utils.toWei(String(auctionStartingPrice), 'ether');
-      console.log(fetchAccounts[0]);
-      setToggleAuctionForm(!toggleAuctionForm);
+      if(auctionDuration < 1){
+        return window.alert("Please Enter hours greater than or equal to 1"); 
+      }
+      let auctionPriceInWei = web3.utils.toWei(auctionStartingPrice, 'ether');
+     
       setLoading(false);
       const startAuction = await contract.methods.startAuction(auctionPriceInWei, auctionDurationInSeconds, auctionIndex).send({
         from: fetchAccounts[0]
       });
+      setToggleAuctionForm(!toggleAuctionForm);
       toast.success("Transaction Successful");
-      console.log(startAuction);
+      // console.log(startAuction);
     }
     catch (err) {
       console.log(err);
@@ -124,7 +125,7 @@ function User() {
     }
   }
 
-  const calculateCountdown = (endTime) => {
+  const getRemainingTime = (endTime) => {
     const now = new Date().getTime();
     const endTimestamp = endTime * 1000; // Convert seconds to milliseconds
     const remainingTime = endTimestamp - now;
@@ -135,10 +136,10 @@ function User() {
 
   const handleFinalizeAuction = async (index, price) => {
     try{
-      console.log(index)
+      // console.log(index)
       const auctionDetails = await ApiService.getAuctionWithId(index);
       // console.log(auctionDetails);
-      const auctionTime = calculateCountdown(Number(auctionDetails.endTime));
+      const auctionTime = getRemainingTime(Number(auctionDetails.data.data.endTime));
       // console.log(auctionTime);
       if (auctionTime > 0) {
         return window.alert("You can not finalize the auction yet.");
@@ -151,7 +152,7 @@ function User() {
       const accounts = await web3.eth.getAccounts();
   
       const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "sell" });
-      console.log(saveTx);
+      // console.log(saveTx);
       let finalize = await contract.methods.finalizeAuction(index).send({
         from: accounts[0]
       });
@@ -259,12 +260,13 @@ function User() {
                 <p>{Boolean(item?.isListedForAuction)}</p>
                 {/* {Boolean(item?.isListedForAuction) && <p>Highest Bid : {web3.utils.fromWei(item.highestBid, "ether")}</p>} */}
               </div>
+                {/* {item?.isListedForAuction && <p>You can Finalize Auction in : <br /><Countdown text="" endTime={item.endTime}/></p>}  */}
               <div className='flex justify-between items-center mt-3'>
                 {/* <p>Sold : {item.isSold.toString()}</p> */}
-
-                {Boolean(item?.isListedForAuction) ? <button className='py-2 rounded-md btn-primary px-3' onClick={() => handleFinalizeAuction(item?.auctionIndex, item.price)}>Finalize Auction</button> :
-                  Boolean(!item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-3' onClick={() => handleAuction(item.tokenIndex)}>Auction</button>
+                {Boolean(item?.isListedForAuction) ? <button className={getRemainingTime(item?.endTime) > 0 ? 'py-2 rounded-md btn-primary px-3 disabled' : 'py-2 rounded-md btn-primary px-3'} disabled={getRemainingTime(item?.endTime) > 0} onClick={() => handleFinalizeAuction(item?.auctionIndex, item.price)}>{getRemainingTime(item.endTime) > 0 ? <Countdown text="Finalize in " endTime = {item.endTime}/> : "Finalize Auction"}</button> :
+                  Boolean(!item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-3' onClick={() => handleAuction(item.tokenId)}>Auction</button>
                 }
+                  {/* {console.log()} */}
                 {Boolean(!item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-5' onClick={() => sellNft(item.tokenId)}>Sell</button>}
               </div>
             </div>
@@ -281,7 +283,7 @@ function User() {
               <div className='gap-10 tx py-2 px-4 inline-flex rounded-lg col-span-1'>
                 <p>Token Id : {item.tokenId}</p>
                 {/* {setTxAmount(item?.transactionAmount ?? "xx")} */}
-                {/* <p>Transaction Amount : {txAmount == "xx" ? "" : web3.utils.fromWei(txAmount, "ether")} ETH</p> */}
+                {/* <p>Transaction Amount : {web3.utils.fromWei(item.transactionAmount, "ether")} ETH</p> */}
                 <p>Transaction Type : {item.transactionType}</p>
               </div>
             )

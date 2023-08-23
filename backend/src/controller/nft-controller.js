@@ -8,8 +8,9 @@ const {
   getAllCategories, 
   searchByCategory,
   txHistory, 
-  findByTokenId,
-  viewUserTxHistory
+  findAuctionByTokenId,
+  viewUserTxHistory, 
+  sortByPrice,
 } = require("./../services/nft-services");
 
 const NFT = require("./../models/nft-model"); 
@@ -196,11 +197,11 @@ const saveTxHistory = async (req, res) => {
   }
 }
 
-const getNFTByTokenId = async(req, res) => {
+const getAuctionNFTByTokenId = async(req, res) => {
   const {id} = req.params; 
   try{
-    console.log(id);
-    const nftData = await findByTokenId(id); 
+    // console.log(id);
+    const nftData = await findAuctionByTokenId(id); 
     return res.status(200).json({success : true, data : nftData}); 
   }
   catch(err){
@@ -219,6 +220,20 @@ const getUserTxHistory = async (req, res) => {
     }
 }
 
+const getAuctionsSortedByPrice = async (req, res) => {
+    const {order} = req.body; 
+    try{
+        const data = await sortByPrice(order); 
+        return res.status(200).json({
+          success : true, 
+          data : data
+        }); 
+    } 
+    catch(err){
+        return res.status(500).json({success : false, error : err.message}); 
+    }
+}
+
 module.exports = {
   getAllListedNfts,
   addNFT,
@@ -230,6 +245,7 @@ module.exports = {
   getNFTByCategory,
   addNewNFTToDB, 
   saveTxHistory, 
-  getNFTByTokenId,
-  getUserTxHistory
+  getAuctionNFTByTokenId,
+  getUserTxHistory, 
+  getAuctionsSortedByPrice,
 };

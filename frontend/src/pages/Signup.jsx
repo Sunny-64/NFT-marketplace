@@ -63,7 +63,7 @@ function Signup() {
                     <form action="" encType='multipart/form-data' className='md:w-[80%] sm:w-full' onSubmit={handleSubmit}>
                         <div className='mb-3 flex flex-col'>
                             <label htmlFor="username">Username</label>
-                            <input type="text" id='username' name='username' className='py-2 rounded-md text-black px-4' required value={username} onChange={(e) => setUsername(e.target.value)}/>
+                            <input type="text" pattern='^[A-Za-z]+$' id='username' name='username' className='py-2 rounded-md text-black px-4' required value={username} onChange={(e) => setUsername(e.target.value)}/>
                         </div>
                         <div className='flex flex-col mb-3'>
                             <label htmlFor="email">Email</label>

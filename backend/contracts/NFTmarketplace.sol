@@ -145,28 +145,22 @@ contract Market is ERC721URIStorage, Ownable {
     }
 
      function finalizeAuction(uint auctionIndex) public payable onlyAuctionOwner(auctionIndex){
-
         // require(auctions[auctionIndex].highestBid > 0, "No one has bid on the auction");
-        if(auctions[auctionIndex].highestBid <= 0){
-            auctions[auctionIndex] = auctions[auctions.length - 1]; 
-            auctions.pop(); 
-        }
-        else{
+        if(auctions[auctionIndex].highestBid > 0){
+            
             address prevOwner = auctions[auctionIndex].creator; 
-
             // transfer the ownership
             transferFrom(prevOwner, auctions[auctionIndex].highestBidder, tokens[auctions[auctionIndex].tokenIndex].tokenId);
 
             // change the owner details 
             tokens[auctions[auctionIndex].tokenIndex].owner = payable(auctions[auctionIndex].highestBidder); 
             tokens[auctions[auctionIndex].tokenIndex].price = auctions[auctionIndex].highestBid; 
-            tokens[auctions[auctionIndex].tokenIndex].isListedForAuction = false; 
 
             payable(auctions[auctionIndex].creator).transfer(auctions[auctionIndex].highestBid);
-
-            // Remove the NFT from the auction
-            auctions[auctionIndex] = auctions[auctions.length - 1]; 
-            auctions.pop(); 
         }
+        // Remove the NFT from the auction
+        auctions[auctionIndex] = auctions[auctions.length - 1]; 
+        tokens[auctions[auctionIndex].tokenIndex].isListedForAuction = false; 
+        auctions.pop(); 
     }
 }

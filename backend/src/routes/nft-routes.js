@@ -1,6 +1,7 @@
 const router = require("express").Router(); 
 const {getAllListedNfts, addNFT, getAllNfts, getUserNFTs, getAllAuctions, getNFTByName,
-getNFTCategories, getNFTByCategory, addNewNFTToDB, saveTxHistory, getNFTByTokenId, getUserTxHistory} = require("./../controller/nft-controller"); 
+getNFTCategories, getNFTByCategory, addNewNFTToDB, saveTxHistory, getAuctionNFTByTokenId, getUserTxHistory,
+getAuctionsSortedByPrice,} = require("./../controller/nft-controller"); 
 
 router.get("/", getAllNfts);
 router.get("/listed", getAllListedNfts); 
@@ -9,7 +10,8 @@ router.get("/auctions", getAllAuctions);
 router.get("/categories", getNFTCategories); 
 router.get("/categories/:category", getNFTByCategory); 
 router.get("/search/:name", getNFTByName); 
-router.get("/auction/:id", getNFTByTokenId);  
+router.get("/auction/:id", getAuctionNFTByTokenId);  
+router.get("/auctions/sort/price/:order", getAuctionsSortedByPrice); 
 
 router.use(require("./../middlewares/auth")); 
 

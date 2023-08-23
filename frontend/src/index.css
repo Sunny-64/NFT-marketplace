@@ -107,3 +107,7 @@ footer {
 .dropdown:hover .dropbtn {
   background-color: var(--secondary);
 }
+
+.disabled{
+  opacity: 0.6;
+}

@@ -17,7 +17,7 @@ import { io } from "socket.io-client";
 
 function MintNFT() {
     const navigate = useNavigate();
-    const socket = useRef(); 
+    // const socket = useRef(); 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
@@ -58,12 +58,7 @@ function MintNFT() {
             console.log(contract);
             setLoading(true); 
             // const gasPrice = web3.utils.toWei("0.01", "ether"); 
-            
-   
-            socket.current = io("http://localhost:3000", { transports: ["websocket"] });
-            
-            // socket.current.on("mint", async (m) => {
-                // console.log("Inside the socket"); 
+         
                await new Promise(async (resolve, reject) => {
                     // console.log("promise executed...");
                     try{

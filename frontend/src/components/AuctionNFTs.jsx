@@ -9,11 +9,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
 
+import Countdown from './Countdown';
+
 
 function AuctionNFTs() {
     const [auctions, setAuctions] = useState([]);
     const [contract, setContract] = useState({});
     // const [time, setTime] = useState(0)
+    // const t
     let [loading, setLoading] = useState(false);
     useEffect(() => {
         // initialize the contract...
@@ -34,11 +37,16 @@ function AuctionNFTs() {
             });
 
         const fetchData = async () => {
-            const data = await ApiService.fetchAuctions();
-            console.log(data.data.data);
-            if (data.status === 200) {
-                setAuctions(data.data.data);
-            }
+           try{
+                const data = await ApiService.fetchAuctions();
+                console.log(data.data.data);
+                if (data.status === 200) {
+                    setAuctions(data.data.data);
+                }
+           }
+           catch(err){
+                console.log(err.message);
+           }
         }
         fetchData();
 
@@ -50,26 +58,6 @@ function AuctionNFTs() {
         const remainingTime = endTimestamp - now;
         return remainingTime;
     }
-
-    // const getFormatedTime = (endTime) => {
-    //     // const now = new Date().getTime();
-    //     const date = new Date(endTime); 
-    //     return date.toString(); 
-    // }
-
-    const calculateCountdown = (endTime) => {
-        const remainingTime = getRemainingTime(endTime);
-        // setCountDown(remainingTime); 
-        const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-
-
-        return remainingTime > 0 ? `${days}d ${hours}h ${minutes}m ${seconds}s` : 0;
-    };
-
-
 
     console.log(contract);
     const handleBidding = async (highestBid, index, endTime) => {
@@ -89,7 +77,6 @@ function AuctionNFTs() {
             if (web3.utils.toWei(biddingAmount, "ether") < highestBid) {
                 return window.alert("Bid a higher amount than the previous bid");
             }
-
             // initiate bidding...
             console.log("Bidding...")
             // console.log(contract)
@@ -130,7 +117,6 @@ function AuctionNFTs() {
                 aria-label="Loading Spinner"
                 data-testid="loader"
             />
-            {/* </div> */}
 
             <ToastContainer
                 position="top-right"
@@ -149,11 +135,12 @@ function AuctionNFTs() {
             <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1'>
                 {
                     auctions?.map((item, index) => {
-                        return (
-                            <div key={index} className='card bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] mb-6 mt-10'>
+                       return getRemainingTime(item.endTime) > 0 && 
+                       <div key={index} className='card bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] mb-6 mt-10'>
                                 <p>name : {item.tokenName}</p>
                                 <p className='break-words'>Description : {item.tokenDescription}</p>
-                                <p>Auction Ends in : {calculateCountdown(item.endTime)}</p>
+                                <Countdown text={"Auction ends in : "} endTime={item.endTime}/>
+
                                 <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
                                 <div className='flex flex-col'>
                                     <p>Highest Bid : {Number(web3.utils.fromWei(item.highestBid, "ether"))} ETH</p>
@@ -163,8 +150,7 @@ function AuctionNFTs() {
                                     <p>Category : {item.category}</p>
                                     <button className='py-2 rounded-md btn-primary px-7' disable={getRemainingTime(item.endTime) > 0 ? "false" : "true"} onClick={() => handleBidding(item.highestBid, index, item.endTime)}>Bid</button>
                                 </div>
-                            </div>
-                        )
+                        </div>
                     })
                 }
             </div>
