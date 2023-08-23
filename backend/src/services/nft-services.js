@@ -227,6 +227,7 @@ const findAllAuctions = async () => {
 const sortByPrice = async (order) => {
     try{
         const auctions = await findAllAuctions(); 
+        console.log(auctions);
         return auctions; 
     }
     catch(err){

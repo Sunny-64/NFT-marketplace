@@ -15,17 +15,18 @@ import Countdown from './Countdown';
 function AuctionNFTs() {
     const [auctions, setAuctions] = useState([]);
     const [contract, setContract] = useState({});
-    // const [time, setTime] = useState(0)
-    // const t
+    const [accounts, setAccounts] = useState([]); 
+
     let [loading, setLoading] = useState(false);
     useEffect(() => {
         // initialize the contract...
         initContract()
-            .then((contractInstance) => {
+            .then(async (contractInstance) => {
                 if (contractInstance) {
                     // Contract initialized successfully
-                    console.log("Contract initialized.");
                     setContract(contractInstance)
+                    setAccounts(await web3.eth.getAccounts()); 
+                    console.log("Contract initialized and accounts fetched");
 
                 } else {
                     // Handle the case when the contract could not be initialized
@@ -59,8 +60,11 @@ function AuctionNFTs() {
         return remainingTime;
     }
 
-    console.log(contract);
+    // console.log(contract);
     const handleBidding = async (highestBid, index, endTime) => {
+        if(!web3){
+            window.alert("please install or login to metamask"); 
+        }
         if (getRemainingTime(endTime) < 0) {
             return window.alert("Auction is over you can't bid anymore")
         }
@@ -74,14 +78,14 @@ function AuctionNFTs() {
             const accounts = await web3.eth.getAccounts();
             console.log(accounts);
             console.log(highestBid);
-            if (web3.utils.toWei(biddingAmount, "ether") < highestBid) {
+            if (web3?.utils?.toWei(biddingAmount, "ether") < highestBid) {
                 return window.alert("Bid a higher amount than the previous bid");
             }
             // initiate bidding...
             console.log("Bidding...")
             // console.log(contract)
 
-            const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3.utils.toWei(biddingAmount, "ether"), transactionType: "bid" });
+            const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3?.utils?.toWei(biddingAmount, "ether"), transactionType: "bid" });
             console.log(saveTx);
             setLoading(false); 
             const bid = await contract.methods.bidOnAuction(index).send({
@@ -143,8 +147,8 @@ function AuctionNFTs() {
 
                                 <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
                                 <div className='flex flex-col'>
-                                    <p>Highest Bid : {Number(web3.utils.fromWei(item.highestBid, "ether"))} ETH</p>
-                                    <p>Starting Price : {Number(web3.utils.fromWei(item.startingPrice, "ether"))} ETH</p>
+                                    <p>Highest Bid : {Number(web3?.utils?.fromWei(item.highestBid, "ether"))} ETH</p>
+                                    <p>Starting Price : {Number(web3?.utils?.fromWei(item.startingPrice, "ether"))} ETH</p>
                                 </div>
                                 <div className='flex justify-between items-center mt-3'>
                                     <p>Category : {item.category}</p>

@@ -40,7 +40,7 @@ function MintNFT() {
             if (!image) {
                 return;
             }
-            setLoading(true); 
+            setLoading(true);
             imageName = (uuidv4() + "." + image.type.split("/")[1]);
 
             const storageRef = ref(storage, `images/${imageName}`);
@@ -48,78 +48,58 @@ function MintNFT() {
             console.log("Image uploaded to firebase...");
 
             const imageDownloadUrl = await getDownloadURL(ref(storage, `images/${imageName}/`));
-            setLoading(false); 
-            toast.success("NFT created... Confirming transaction"); 
-            // make request to blockchain for minting the NFT.
-            // console.log("Image Download URL : ",imageDownloadUrl);
+            setLoading(false);
+            toast.success("NFT created... Confirming transaction");
 
             // get accounts  
             const accounts = await web3.eth.getAccounts();
             console.log(contract);
-            setLoading(true); 
-            // const gasPrice = web3.utils.toWei("0.01", "ether"); 
-         
-               await new Promise(async (resolve, reject) => {
-                    // console.log("promise executed...");
-                    try{
-                        const executeMint = await contract.methods.mintNFT(imageDownloadUrl, name, description, category)
-                        .send({
-                            from: accounts[0], 
-                            // gasPrice : gasPrice
-                        });
-                        console.log(executeMint);
-                        toast.success("Transaction successful"); 
-                        setLoading(false); 
-            
-                        const data = {
-                            tokenId: Number(executeMint.logs[1].data),
-                            tokenName: name,
-                            tokenURI: imageDownloadUrl,
-                            tokenDescription: description,
-                            ownerAddress: accounts[0],
-                            category: category
-                        }
-            
-                        console.log("Data to be sent to the server : ", data);
-                        const saveNFTData = await ApiService.addNFT(data);
-                        // console.log("Data to be sent to the server ",data);
-                        if (saveNFTData.status === 200) {
-                            console.log("NFT SAVED...");
-                        }
-                        else {
-                            console.log("NFT not saved")
-                            
-                        }
-                        console.log('result : ', executeMint);
-                        resolve(); 
-                    }   
-                    catch(err){
-                        reject(err.message);
-                    }
+            setLoading(true);
+
+            // make request to blockchain for minting the NFT.
+            contract.methods.mintNFT(imageDownloadUrl, name, description, category)
+                .send({
+                    from: accounts[0],
                 })
-            // })    
+                .then(executeMint => {
+                    console.log(executeMint);
+                    toast.success("Transaction successful");
+                    setLoading(false);
+
+                    const data = {
+                        tokenId: Number(executeMint.logs[1].data),
+                        tokenName: name,
+                        tokenURI: imageDownloadUrl,
+                        tokenDescription: description,
+                        ownerAddress: accounts[0],
+                        category: category
+                    }
+
+                    console.log("Data to be sent to the server : ", data);
+                    ApiService.addNFT(data)
+                        .then(saveNFTData => {
+                            if (saveNFTData.status === 200) {
+                                console.log("NFT SAVED...");
+                            }
+                            else {
+                                console.log("NFT not saved")
+
+                            }
+                            console.log('result : ', executeMint);
+                            navigate("/profile"); 
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
+                })
+                .catch(err => {
+                    console.log(err);
+                });
         }
         catch (err) {
             console.log(err)
         }
     }
-
-    // useEffect(() => {
-    //     contract.events.NFTMinted().on("data", d => {
-    //         console.log(d);
-    //     })
-    // }, [])
-    // console.log(contract.events.NFTMinted());
-    // console.log(contract?.events?.NFTMinted());
-    // useEffect(() => {
-    //     // const event = contract.events.NFTMinted(); 
-    //     // event.on("data", data => {
-    //     //     console.log(data);
-    //     // })
-    //     console.log(event);
-    // })
-
-
 
     useEffect(() => {
         initContract()
@@ -150,7 +130,6 @@ function MintNFT() {
         margin: "0 auto",
         borderColor: "blue",
         position: "absolute",
-        // width : "", 
         top: "50%",
         marginLeft: "auto",
         display: "block",

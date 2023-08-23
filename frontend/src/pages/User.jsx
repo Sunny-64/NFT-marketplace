@@ -12,7 +12,7 @@ import Countdown from '../components/Countdown';
 function User() {
   const navigate = useNavigate();
   // console.log(sessionStorage.getItem("isLoggedIn"));
-  if (!sessionStorage.getItem("isLoggedIn")) {
+  if (!localStorage.getItem("TOKEN") || !web3) {
     navigate("/");
   }
   const [userData, setUserData] = useState();
@@ -255,8 +255,8 @@ function User() {
               <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
               <div className='flex justify-between'>
                 {/* <p>Item Id : {item.tokenId}</p> */}
-                {Boolean(item?.isListedForSale) && <p>Price : {web3.utils.fromWei(item?.price, "ether")} ETH</p>}
-                {!Boolean(item?.isListedForSale) && !Boolean(item?.isListedForAuction) && <p>Price : {web3.utils.fromWei(item.price, "ether")} ETH</p>}
+                {Boolean(item?.isListedForSale) && <p>Price : {Number(web3.utils.fromWei(item?.price, "ether"))} ETH</p>}
+                {!Boolean(item?.isListedForSale) && !Boolean(item?.isListedForAuction) && <p>Price : {Number(web3?.utils?.fromWei(item.price, "ether"))} ETH</p>}
                 <p>{Boolean(item?.isListedForAuction)}</p>
                 {/* {Boolean(item?.isListedForAuction) && <p>Highest Bid : {web3.utils.fromWei(item.highestBid, "ether")}</p>} */}
               </div>

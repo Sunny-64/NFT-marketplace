@@ -63,6 +63,15 @@ const addNFT = async (req, res) => {
   } = req.body;
 
   const userId = req.user._id;
+
+  // console.log(`
+  //       Token name : ${tokenName} \n 
+  //       Token Id : ${tokenId} \n 
+  //       Token URI : ${tokenURI} \n 
+  //       Token Desc : ${tokenDescription} \n 
+  //       Token Cate : ${category} \n 
+  //   `);
+
   if (
     !(
       tokenName &&
@@ -72,6 +81,7 @@ const addNFT = async (req, res) => {
       category
     )
   ) {
+    
     return res.status(400).json({ success: false, message: "Invalid data" });
   }
   try {

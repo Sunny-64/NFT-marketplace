@@ -14,6 +14,7 @@ import MintNFT from './pages/MintNFT';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Search from './pages/Search';
+import PageNotFound from './pages/PageNotFound';
 
 const router = createBrowserRouter([
   {
@@ -37,7 +38,7 @@ const router = createBrowserRouter([
       }, 
       {
         path : "/profile",
-        element : <User />
+        element : localStorage.getItem("TOKEN") ? <User /> : <PageNotFound />
       },
       {
         path : "/search",
