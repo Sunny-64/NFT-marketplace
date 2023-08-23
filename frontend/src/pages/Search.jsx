@@ -9,6 +9,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
 
+import web3Utils from '../scripts/web3Utils';
+
 function Search() {
   const [nfts, setNfts] = useState([]); 
   const [contract, setContract] = useState({}); 
@@ -155,11 +157,11 @@ function Search() {
                 <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
                 <div className='flex justify-between'>
                   <p>Item Id : {item.tokenId}</p>
-                  <p>Price : {web3.utils.fromWei(item.price, "ether")}</p>
+                  <p>Price : {Number(web3Utils.fromWei(item.price, "ether"))}</p>
                 </div>
                 <div className='flex justify-between items-center mt-3'>
                   <p>Category : {item.category}</p>
-                  <button className='py-2 rounded-md btn-primary px-3' onClick={() => purchaseNFT(index, item.price)}>Purchase</button>
+                  {item.price > 0 && <button className='py-2 rounded-md btn-primary px-3' onClick={() => purchaseNFT(index, item.price)}>Purchase</button>}
                 </div>
               </div>
             </>

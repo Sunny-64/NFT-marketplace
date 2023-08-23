@@ -10,7 +10,7 @@ import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
 
 import Countdown from './Countdown';
-
+import web3Utils from '../scripts/web3Utils';
 
 function AuctionNFTs() {
     const [auctions, setAuctions] = useState([]);
@@ -147,8 +147,8 @@ function AuctionNFTs() {
 
                                 <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
                                 <div className='flex flex-col'>
-                                    <p>Highest Bid : {Number(web3?.utils?.fromWei(item.highestBid, "ether"))} ETH</p>
-                                    <p>Starting Price : {Number(web3?.utils?.fromWei(item.startingPrice, "ether"))} ETH</p>
+                                    <p>Highest Bid : {web3Utils.fromWei(item.highestBid, "ether")} ETH</p>
+                                    <p>Starting Price : {web3Utils.fromWei(item.startingPrice, "ether")} ETH</p>
                                 </div>
                                 <div className='flex justify-between items-center mt-3'>
                                     <p>Category : {item.category}</p>

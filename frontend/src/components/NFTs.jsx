@@ -10,12 +10,15 @@ import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
 
 import { useNavigate } from "react-router-dom";
+import web3Utils from '../scripts/web3Utils';
 
 function NFTs() {
   const [nfts, setNfts] = useState();
   const [contract, setContract] = useState("");
   let [loading, setLoading] = useState(false);
   let [accounts, setAccounts] = useState([]); 
+
+  // console.log(web3Utils);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,7 +134,7 @@ function NFTs() {
                 <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
                 <div className='flex justify-between'>
                   <p>Item Id : {item.tokenId}</p>
-                  <p>Price : {Number(web3?.utils?.fromWei(item.price ?? 0, "ether"))}</p>
+                  <p>Price : {web3Utils.fromWei(item.price, "ether")} ETH</p>
                 </div>
                 <div className='flex justify-between items-center mt-3'>
                   <p>Category : {item.category}</p>
