@@ -6,8 +6,6 @@ import AuctionNFTs from '../components/AuctionNFTs'
 function Home() {
   return (
     <section id='Home' className='px-8 mb-8'>
-        {/* NFTs... */}
-        {/* <SearchBar /> */}
         <NFTs/>
         <AuctionNFTs />
     </section>

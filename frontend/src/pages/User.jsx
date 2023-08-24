@@ -88,7 +88,9 @@ function User() {
       });
 
       setLoading(false);
+      toast.success("NFT listed for Sale"); 
       console.log("NFT is Now Listed For Sale : ", listNft);
+      navigate("/"); 
     }
     catch (err) {
       console.log(err);
@@ -117,6 +119,7 @@ function User() {
       });
       setToggleAuctionForm(!toggleAuctionForm);
       toast.success("Transaction Successful");
+      navigate("/");
       // console.log(startAuction);
     }
     catch (err) {

@@ -12,31 +12,13 @@ import MoonLoader from "react-spinners/MoonLoader";
 import Countdown from './Countdown';
 import web3Utils from '../scripts/web3Utils';
 
+import AuctionNFT from './AuctionNFT';
+
 function AuctionNFTs() {
     const [auctions, setAuctions] = useState([]);
-    const [contract, setContract] = useState({});
-    const [accounts, setAccounts] = useState([]); 
-
     let [loading, setLoading] = useState(false);
     useEffect(() => {
         // initialize the contract...
-        initContract()
-            .then(async (contractInstance) => {
-                if (contractInstance) {
-                    // Contract initialized successfully
-                    setContract(contractInstance)
-                    setAccounts(await web3.eth.getAccounts()); 
-                    console.log("Contract initialized and accounts fetched");
-
-                } else {
-                    // Handle the case when the contract could not be initialized
-                    console.log("Failed to initialize contract.");
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-
         const fetchData = async () => {
            try{
                 const data = await ApiService.fetchAuctions();
@@ -58,47 +40,6 @@ function AuctionNFTs() {
         const endTimestamp = endTime * 1000; // Convert seconds to milliseconds
         const remainingTime = endTimestamp - now;
         return remainingTime;
-    }
-
-    // console.log(contract);
-    const handleBidding = async (highestBid, index, endTime) => {
-        if(!web3){
-            window.alert("please install or login to metamask"); 
-        }
-        if (getRemainingTime(endTime) < 0) {
-            return window.alert("Auction is over you can't bid anymore")
-        }
-        const biddingAmount = prompt("Enter the Amount in (ETH) : ");
-        if (!biddingAmount) {
-            return;
-        }
-        // console.log(highestBid, index, biddingAmount);
-        try {
-            setLoading(true); 
-            const accounts = await web3.eth.getAccounts();
-            console.log(accounts);
-            console.log(highestBid);
-            if (web3?.utils?.toWei(biddingAmount, "ether") < highestBid) {
-                return window.alert("Bid a higher amount than the previous bid");
-            }
-            // initiate bidding...
-            console.log("Bidding...")
-            // console.log(contract)
-
-            const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3?.utils?.toWei(biddingAmount, "ether"), transactionType: "bid" });
-            console.log(saveTx);
-            setLoading(false); 
-            const bid = await contract.methods.bidOnAuction(index).send({
-                from: accounts[0],
-                value: web3.utils.toWei(biddingAmount, "ether")
-            });
-
-            console.log("success : ", bid);
-            window.location.reload();
-        }
-        catch (err) {
-            console.log(err);
-        }
     }
 
     const override = {
@@ -140,27 +81,25 @@ function AuctionNFTs() {
                 {
                     auctions?.map((item, index) => {
                        return getRemainingTime(item.endTime) > 0 && 
-                       <div key={index} className='card bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] mb-6 mt-10'>
-                                <p>name : {item.tokenName}</p>
-                                <p className='break-words'>Description : {item.tokenDescription}</p>
-                                <Countdown text={"Auction ends in : "} endTime={item.endTime}/>
-
-                                <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
-                                <div className='flex flex-col'>
-                                    <p>Highest Bid : {web3Utils.fromWei(item.highestBid, "ether")} ETH</p>
-                                    <p>Starting Price : {web3Utils.fromWei(item.startingPrice, "ether")} ETH</p>
-                                </div>
-                                <div className='flex justify-between items-center mt-3'>
-                                    <p>Category : {item.category}</p>
-                                    <button className='py-2 rounded-md btn-primary px-7' disable={getRemainingTime(item.endTime) > 0 ? "false" : "true"} onClick={() => handleBidding(item.highestBid, index, item.endTime)}>Bid</button>
-                                </div>
-                        </div>
+                      
+                        <AuctionNFT 
+                            key={index}
+                            tokenName = {item.tokenName}
+                            tokenDescription = {item.tokenDescription}
+                            tokenURI = {item.tokenURI}
+                            highestBid = {item.highestBid}
+                            startingPrice = {item.startingPrice}
+                            category = {item.category}
+                            endTime = {item.endTime}    
+                            creator = {item.creator}    
+                        />
+                       
                     })
                 }
             </div>
         </>
-
     )
 }
 
 export default AuctionNFTs
+

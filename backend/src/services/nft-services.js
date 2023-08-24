@@ -3,6 +3,7 @@ const contractInstance = require("../helpers/contract");
 const NFT = require("./../models/nft-model");
 const User = require("./../models/user-model");
 const Tx = require("./../models/transaction-history"); 
+var _ = require('lodash');
 
 
 async function getAuctionByTokenId(tokenId){
@@ -224,15 +225,52 @@ const findAllAuctions = async () => {
     }
 }
 
-const sortByPrice = async (order) => {
+const sortAuctionByPrice = async (order) => {
+    // console.log(order);
+    if(order !== "descending" && order !== "ascending"){
+        throw new Error("Invalid input ", order); 
+    }
     try{
         const auctions = await findAllAuctions(); 
-        console.log(auctions);
-        return auctions; 
+        auctions.forEach((item) => {
+            if(item.highestBid > 0){
+                item.price = item.highestBid; 
+            }
+            else{
+              item.price = item.startingPrice;
+            }
+        })
+        let result = _.sortBy(auctions, ['price']); 
+        // console.log(result);
+        if(order === "descending"){
+            result = _.reverse(result); 
+        }
+
+        result.forEach((item) => {
+          delete item.price
+        }); 
+        return result;
     }
     catch(err){
         throw new Error(err); 
     }
+}
+
+const sortTokenByPrice = async (order) => {
+  if(order !== "descending" && order !== "ascending"){
+    throw new Error("Invalid input ", order); 
+  }
+  try{
+      const auctions = await findListedNfts(); 
+      let result = _.sortBy(auctions, ['price']); 
+      if(order === "descending"){
+          result = _.reverse(result); 
+      }
+      return result;
+  }
+  catch(err){
+      throw new Error(err); 
+  }
 }
 
 const searchNFTByName = async(name) => {
@@ -287,8 +325,6 @@ const nftLikeDislike = async (userId, token) => {
     throw new Error("there was an error"); 
   }
 }
-
-
 
 const txHistory = async (data) => {
     const {tokenId, transactionAmount, transactionType, userId} = data; 
@@ -356,5 +392,6 @@ module.exports = {
   txHistory,
   findAuctionByTokenId, 
   viewUserTxHistory,
-  sortByPrice, 
+  sortAuctionByPrice, 
+  sortTokenByPrice,
 };
