@@ -17,6 +17,8 @@ import AuctionNFT from './AuctionNFT';
 function AuctionNFTs() {
     const [auctions, setAuctions] = useState([]);
     let [loading, setLoading] = useState(false);
+    const [priceOrderSelection, setPriceOrderSelection] = useState("Sort By Price");
+
     useEffect(() => {
         // initialize the contract...
         const fetchData = async () => {
@@ -35,9 +37,27 @@ function AuctionNFTs() {
 
     }, []);
 
-    const sortNFTByPrice = async () => {
-
+    const handleSortByPrice = async (order) => {
+        console.log("clicked");
+        if (order === "highToLow") {
+            setPriceOrderSelection("High to Low");
+            setLoading(true);
+            const fetchNfts = await ApiService.sortNFTListedForAuctionByPrice("descending");
+            console.log("high : ", fetchNfts);
+            setAuctions(fetchNfts.data.data);
+            setLoading(false);
+        }
+        if (order === "lowToHigh") {
+            setLoading(true);
+            setPriceOrderSelection("Low To High");
+            const fetchNfts = await ApiService.sortNFTListedForAuctionByPrice("ascending");
+            // console.log(fetchNfts);
+            setAuctions(fetchNfts.data.data);
+            console.log("low : ", fetchNfts);
+            setLoading(false);
+        }
     }
+
 
     const getRemainingTime = (endTime) => {
         const now = new Date().getTime();
@@ -83,11 +103,13 @@ function AuctionNFTs() {
 
             <div className='flex justify-between'>
                 {auctions?.length > 0 ? <h3 className='font-semibold text-3xl mb-4'>Auction NFTs</h3> : <p className='mt-5'>No NFT's has been listed for Auction yet</p>}
-                <select style={{color : "black"}}>
-                    <option selected style={{color : "black"}} disabled="true" className='' value="">Sort by Price</option>
-                    <option style={{color : "black"}} className='outline-none' value="descending">High to low</option>
-                    <option style={{color : "black"}} value="ascending">Low to high</option>
-                </select>
+                <div className="dropdown absolute right-[5%]">
+                    <button className="dropbtn px-3 py-1 rounded-md">{priceOrderSelection}</button>
+                    <div className="dropdown-content rounded-md hover:rounded-md">
+                        <p className='cursor-pointer' onClick={() => handleSortByPrice("highToLow")}>High to Low</p>
+                        <p className='cursor-pointer' onClick={() => handleSortByPrice("lowToHigh")}>Low to High</p>
+                    </div>
+                </div>
             </div>
             <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1'>
                 {

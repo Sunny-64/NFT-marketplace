@@ -64,6 +64,14 @@ class APIServices{
     getTxHistory(){
         return axios.get(`${BASE_URL}/nfts/user/txs`, {headers : HEADERS}); 
     }
+
+    sortNFTListedForSaleByPrice(order){
+        return axios.get(`${BASE_URL}/nfts/sort/price/${order}`); 
+    }
+
+    sortNFTListedForAuctionByPrice(order){
+        return axios.get(`${BASE_URL}/nfts/auctions/sort/price/${order}`); 
+    }
 }
 
 
