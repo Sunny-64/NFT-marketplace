@@ -25,6 +25,7 @@ function User() {
   const [txs, setTxs] = useState([]);
   let [loading, setLoading] = useState(false);
   const [txAmount, setTxAmount] = useState(); 
+  const [accounts, setAccounts] = useState([]); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,11 +50,12 @@ function User() {
 
   useEffect(() => {
     initContract()
-      .then((contractInstance) => {
+      .then(async (contractInstance) => {
         if (contractInstance) {
           // Contract initialized successfully
           console.log("Contract initialized.");
           setContract(contractInstance)
+          setAccounts(await web3.eth.getAccounts()); 
 
         } else {
           // Handle the case when the contract could not be initialized
@@ -169,6 +171,27 @@ function User() {
     }
   }
 
+  const removeFromSale = async (tokenIndex) => {
+    console.log(tokenIndex);
+     try{
+        let confirm = window.confirm("Are you sure you want to Remove it from sale"); 
+        if(!confirm){
+            return; 
+        }
+        toast("Removing from Sale please wait"); 
+        const remove = await contract.methods.removeFromSale(tokenIndex).send({
+            from : accounts[0], 
+        }); 
+        toast.success("NFT unlisted form sale successfully"); 
+        setTimeout(() => {
+          navigate("/profile")
+        }, 2000)
+     }
+     catch(err){
+      console.log(err);
+     }
+  }
+
 
   const override = {
     margin: "0 auto",
@@ -272,6 +295,7 @@ function User() {
                 }
                   {/* {console.log()} */}
                 {Boolean(!item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-5' onClick={() => sellNft(item.tokenId)}>Sell</button>}
+                {Boolean(item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-5' onClick={() => removeFromSale(item.tokenId)}>Remove from Sell</button>}
               </div>
             </div>
           )
@@ -284,7 +308,7 @@ function User() {
       <div className='grid grid-cols-2 gap-4'>
         {txs?.map((item, key) => {
             return (
-              <div className='gap-10 tx py-2 px-4 inline-flex rounded-lg col-span-1'>
+              <div key={key} className='gap-10 tx py-2 px-4 inline-flex rounded-lg col-span-1'>
                 <p>Token Id : {item.tokenId}</p>
                 {/* {setTxAmount(item?.transactionAmount ?? "xx")} */}
                 {/* <p>Transaction Amount : {web3.utils.fromWei(item.transactionAmount, "ether")} ETH</p> */}

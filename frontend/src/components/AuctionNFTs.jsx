@@ -20,20 +20,24 @@ function AuctionNFTs() {
     useEffect(() => {
         // initialize the contract...
         const fetchData = async () => {
-           try{
+            try {
                 const data = await ApiService.fetchAuctions();
                 console.log(data);
                 if (data.status === 200) {
                     setAuctions(data.data.data);
                 }
-           }
-           catch(err){
+            }
+            catch (err) {
                 console.log(err.message);
-           }
+            }
         }
         fetchData();
 
     }, []);
+
+    const sortNFTByPrice = async () => {
+
+    }
 
     const getRemainingTime = (endTime) => {
         const now = new Date().getTime();
@@ -76,32 +80,33 @@ function AuctionNFTs() {
                 theme="dark"
             />
 
+
             <div className='flex justify-between'>
                 {auctions?.length > 0 ? <h3 className='font-semibold text-3xl mb-4'>Auction NFTs</h3> : <p className='mt-5'>No NFT's has been listed for Auction yet</p>}
-                {/* <select name="sortByPrice" id="sortByPrice">
-                    <option style={{color : "black"}}>Sort By Price</option>
-                    <option selected value={"js"} style={{color : "black"}}>Sort By Price</option>
-                    <option  style={{color : "black"}}>Sort By Price</option>
-                </select> */}
+                <select style={{color : "black"}}>
+                    <option selected style={{color : "black"}} disabled="true" className='' value="">Sort by Price</option>
+                    <option style={{color : "black"}} className='outline-none' value="descending">High to low</option>
+                    <option style={{color : "black"}} value="ascending">Low to high</option>
+                </select>
             </div>
             <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1'>
                 {
                     auctions?.map((item, index) => {
-                       return getRemainingTime(item.endTime) > 0 && 
-                      
-                        <AuctionNFT 
-                            key={index}
-                            tokenName = {item.tokenName}
-                            tokenDescription = {item.tokenDescription}
-                            tokenURI = {item.tokenURI}
-                            highestBid = {item.highestBid}
-                            startingPrice = {item.startingPrice}
-                            category = {item.category}
-                            endTime = {item.endTime}    
-                            creator = {item.creator}    
-                            index = {index}
-                        />
-                       
+                        return getRemainingTime(item.endTime) > 0 &&
+
+                            <AuctionNFT
+                                key={index}
+                                tokenName={item.tokenName}
+                                tokenDescription={item.tokenDescription}
+                                tokenURI={item.tokenURI}
+                                highestBid={item.highestBid}
+                                startingPrice={item.startingPrice}
+                                category={item.category}
+                                endTime={item.endTime}
+                                creator={item.creator}
+                                index={index}
+                            />
+
                     })
                 }
             </div>

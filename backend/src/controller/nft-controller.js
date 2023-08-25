@@ -73,18 +73,18 @@ const addNFT = async (req, res) => {
         Token Cate : ${category} \n 
     `);
 
-  if (
-    !(
-      tokenName &&
-      tokenId &&
-      tokenURI &&
-      tokenDescription &&
-      category
-    )
-  ) {
+  // if (
+  //   !(
+  //     tokenName &&
+  //     tokenId &&
+  //     tokenURI &&
+  //     tokenDescription &&
+  //     category
+  //   )
+  // ) {
     
-    return res.status(400).json({ success: false, message: "Invalid data" });
-  }
+  //   return res.status(400).json({ success: false, message: "Invalid data" });
+  // }
   try {
     const data = {
       userId,

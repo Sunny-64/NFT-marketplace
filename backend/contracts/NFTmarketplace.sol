@@ -107,7 +107,7 @@ contract Market is ERC721URIStorage, Ownable {
         tokens[index].isListedForSale = true;
     }
 
-    function removeFromSale(uint index) public onlyTokenOwner(index) notListedForSale(index) {
+    function removeFromSale(uint index) public onlyTokenOwner(index) {
         tokens[index].isListedForSale = false;
     }
 

@@ -86,6 +86,7 @@ function NFTs() {
                 price = {item.price}
                 category = {item.category}
                 tokenId = {item.tokenId}
+                owner = {item.owner}
               />
           )
         })}

@@ -1,7 +1,7 @@
 import web3 from "./web3";
 import ABI from "./../static/ABI.json";
 
-const CONTRACT_ADDRESS = "0x9751B3dd5c581d82655EA803c4418E0630f7F7fc";
+const CONTRACT_ADDRESS = "0x9830afdf2B5035FeD001CA9e1cF7d63f4f854f72";
 let contract;
 
 // Function to initialize the contract

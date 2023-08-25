@@ -85,7 +85,7 @@ function NFT(props) {
                 </div>
                 <div className='flex justify-between items-center mt-3'>
                     <p><span className='opacity-80'>Category :</span> <span className='font-semibold'>{props.category}</span></p>
-                    <button className='py-2 rounded-md btn-primary px-3' onClick={() => purchaseNFT(props.tokenId, props.price)}>Purchase</button>
+                    {props.owner !== accounts[0] && <button className='py-2 rounded-md btn-primary px-3' onClick={() => purchaseNFT(props.tokenId, props.price)}>Purchase</button>}
                 </div>
             </div>
         </>

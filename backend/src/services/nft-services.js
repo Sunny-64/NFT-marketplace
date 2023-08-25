@@ -137,7 +137,7 @@ const findUserNFTs = async (publicKey) => {
         
         // if nft is being auctioned accumulate it's data.. and store it in object
         auctionTokens.forEach((auctionItem, index) => {
-          console.log(auctionItem);
+          // console.log(auctionItem);
           if(auctionItem.tokenIndex == item.tokenId){
               let aucObj =  {
                 highestBid : parseInt(auctionItem?.highestBid), 
@@ -145,7 +145,7 @@ const findUserNFTs = async (publicKey) => {
                 index : index, 
                 endTime : parseInt(auctionItem.endTime)
               }
-              console.log(aucObj);
+              // console.log(aucObj);
               auction.push(aucObj); 
           }
         }); 

@@ -38,7 +38,7 @@ const router = createBrowserRouter([
       }, 
       {
         path : "/profile",
-        element : localStorage.getItem("TOKEN") ? <User /> : <PageNotFound />
+        element : sessionStorage.getItem("isLoggedIn") ? <User /> : <PageNotFound />
       },
       {
         path : "/search",
