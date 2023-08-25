@@ -22,7 +22,7 @@ function AuctionNFTs() {
         const fetchData = async () => {
            try{
                 const data = await ApiService.fetchAuctions();
-                console.log(data.data.data);
+                console.log(data);
                 if (data.status === 200) {
                     setAuctions(data.data.data);
                 }
@@ -76,7 +76,14 @@ function AuctionNFTs() {
                 theme="dark"
             />
 
-            {auctions?.length > 0 ? <h3 className='font-semibold text-3xl mb-4'>Auction NFTs</h3> : <p className='mt-5'>No NFT's has been listed for Auction yet</p>}
+            <div className='flex justify-between'>
+                {auctions?.length > 0 ? <h3 className='font-semibold text-3xl mb-4'>Auction NFTs</h3> : <p className='mt-5'>No NFT's has been listed for Auction yet</p>}
+                {/* <select name="sortByPrice" id="sortByPrice">
+                    <option style={{color : "black"}}>Sort By Price</option>
+                    <option selected value={"js"} style={{color : "black"}}>Sort By Price</option>
+                    <option  style={{color : "black"}}>Sort By Price</option>
+                </select> */}
+            </div>
             <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1'>
                 {
                     auctions?.map((item, index) => {
@@ -92,6 +99,7 @@ function AuctionNFTs() {
                             category = {item.category}
                             endTime = {item.endTime}    
                             creator = {item.creator}    
+                            index = {index}
                         />
                        
                     })

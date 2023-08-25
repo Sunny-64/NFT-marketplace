@@ -9,7 +9,7 @@ var _ = require('lodash');
 async function getAuctionByTokenId(tokenId){
     const tokens = await contractInstance.methods.getAllAuctions().call(); 
     const auction = tokens.filter(item => parseInt(item.tokenIndex) == tokenId);  
-    return auction
+    return auction;
 }
 
 const findAllNfts = async () => {
@@ -137,6 +137,7 @@ const findUserNFTs = async (publicKey) => {
         
         // if nft is being auctioned accumulate it's data.. and store it in object
         auctionTokens.forEach((auctionItem, index) => {
+          console.log(auctionItem);
           if(auctionItem.tokenIndex == item.tokenId){
               let aucObj =  {
                 highestBid : parseInt(auctionItem?.highestBid), 
@@ -144,6 +145,7 @@ const findUserNFTs = async (publicKey) => {
                 index : index, 
                 endTime : parseInt(auctionItem.endTime)
               }
+              console.log(aucObj);
               auction.push(aucObj); 
           }
         }); 
@@ -194,11 +196,17 @@ const findAllAuctions = async () => {
     try{
         const nfts = await findAllNfts(); 
         const nftsListedForAuction = nfts.filter(item => item.isListedForAuction); 
+        // console.log(nftsListedForAuction);
         const auctionedNFTs = await contractInstance.methods.getAllAuctions().call(); 
+        // console.log(auctionedNFTs);
         const serializedAuctionedNFTs = []; 
 
         auctionedNFTs.forEach((item, index) => {
-            const auctionedTokenDetails = nftsListedForAuction.filter(t => t.tokenId == item.tokenIndex); 
+            const auctionedTokenDetails = nftsListedForAuction.filter(t => {
+              // console.log(parseInt(t.tokenId) === parseInt(item.tokenIndex));
+              return parseInt(t.tokenId) === parseInt(item.tokenIndex); 
+            }); 
+            console.log(auctionedTokenDetails);
             let obj = {
               auctionIndex : index, 
               tokenName : auctionedTokenDetails[0].name, 

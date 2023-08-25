@@ -65,13 +65,13 @@ const addNFT = async (req, res) => {
 
   const userId = req.user._id;
 
-  // console.log(`
-  //       Token name : ${tokenName} \n 
-  //       Token Id : ${tokenId} \n 
-  //       Token URI : ${tokenURI} \n 
-  //       Token Desc : ${tokenDescription} \n 
-  //       Token Cate : ${category} \n 
-  //   `);
+  console.log(`
+        Token name : ${tokenName} \n 
+        Token Id : ${tokenId} \n 
+        Token URI : ${tokenURI} \n 
+        Token Desc : ${tokenDescription} \n 
+        Token Cate : ${category} \n 
+    `);
 
   if (
     !(

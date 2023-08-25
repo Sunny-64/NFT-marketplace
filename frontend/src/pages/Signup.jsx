@@ -67,7 +67,7 @@ function Signup() {
                         </div>
                         <div className='flex flex-col mb-3'>
                             <label htmlFor="email">Email</label>
-                            <input type="text" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" id='email' name='email' className='py-2 rounded-md text-black px-4' required value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input type="text" pattern="[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" id='email' name='email' className='py-2 rounded-md text-black px-4' required value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div className='flex flex-col mb-3'>
                             <label htmlFor="mobile">Mobile</label>

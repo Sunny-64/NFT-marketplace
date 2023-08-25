@@ -114,10 +114,10 @@ function User() {
       let auctionPriceInWei = web3.utils.toWei(auctionStartingPrice, 'ether');
      
       setLoading(false);
+      setToggleAuctionForm(!toggleAuctionForm); 
       const startAuction = await contract.methods.startAuction(auctionPriceInWei, auctionDurationInSeconds, auctionIndex).send({
         from: fetchAccounts[0]
       });
-      setToggleAuctionForm(!toggleAuctionForm);
       toast.success("Transaction Successful");
       navigate("/");
       // console.log(startAuction);
@@ -250,6 +250,7 @@ function User() {
 
       <div className='mt-8 grid lg:grid-cols-4 gap-3 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 px-4 '>
         {userNfts?.map((item, index) => {
+          {/* console.log(item); */}
           return (
             <div key={index} className='card col-span-1 bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6'>
               {/* <p className='break-words'>Owner: {item[0]}</p> */}

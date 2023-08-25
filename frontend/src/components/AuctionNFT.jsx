@@ -14,6 +14,7 @@ import MoonLoader from "react-spinners/MoonLoader";
 function AuctionNFT(props) {
     let [loading, setLoading] = useState(false);
     const [contract, setContract] = useState({});
+    const [accounts,setAccounts] = useState([]); 
     // console.log(props.endTime);
     useEffect(() => {
         initContract()
@@ -21,6 +22,7 @@ function AuctionNFT(props) {
           if (contractInstance) {
             // Contract initialized successfully
             setContract(contractInstance); 
+            setAccounts(await web3.eth.getAccounts());
             console.log("Contract initialized and accounts fetched");
   
           } else {
@@ -55,7 +57,7 @@ function AuctionNFT(props) {
         // console.log(highestBid, index, biddingAmount);
         try {
             setLoading(true); 
-            const accounts = await web3.eth.getAccounts();
+            
             if(!accounts || accounts?.length <= 0){
                 setLoading(false); 
                 return window.alert("Please login to meta mask first"); 
@@ -122,7 +124,7 @@ function AuctionNFT(props) {
             </div>
             <div className='flex justify-between items-center mt-3'>
                 <p><span className='opacity-80'>Category :</span> <span className='font-semibold'>{props.category}</span></p>
-                <button className='py-2 rounded-md btn-primary px-7' disable={getRemainingTime(props.endTime) > 0 ? "false" : "true"} onClick={() => handleBidding(props.highestBid, props.index, props.endTime, props.creator)}>Bid</button>
+                {accounts[0] !== props.creator && <button className='py-2 rounded-md btn-primary px-7' disable={getRemainingTime(props.endTime) > 0 ? "false" : "true"} onClick={() => handleBidding(props.highestBid, props.index, props.endTime, props.creator)}>Bid</button>}
             </div>
         </div>
     )
