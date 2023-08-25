@@ -259,10 +259,9 @@
 									"type": "text"
 								},
 								{
-									"key": "isListedForSale",
-									"value": "false",
-									"type": "text",
-									"disabled": true
+									"key": "category",
+									"value": "anime",
+									"type": "text"
 								}
 							]
 						},
@@ -321,7 +320,7 @@
 							}
 						],
 						"url": {
-							"raw": "localhost:3000/nfts/user/0xe1c97F156A6E429bD455FE5FFEb0E228eCB83719",
+							"raw": "localhost:3000/nfts/user/0x4aCa4Ad633FFB394Bc6ae90425DAC1383a7a9f6f",
 							"host": [
 								"localhost"
 							],
@@ -329,7 +328,7 @@
 							"path": [
 								"nfts",
 								"user",
-								"0xe1c97F156A6E429bD455FE5FFEb0E228eCB83719"
+								"0x4aCa4Ad633FFB394Bc6ae90425DAC1383a7a9f6f"
 							]
 						}
 					},
@@ -544,6 +543,49 @@
 								"nfts",
 								"user",
 								"txs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get auctions sorted by price",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/nfts/auctions/sort/price/ascending",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"nfts",
+								"auctions",
+								"sort",
+								"price",
+								"ascending"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tokens Sorted By Price",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/nfts/sort/price/ascending",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"nfts",
+								"sort",
+								"price",
+								"ascending"
 							]
 						}
 					},
