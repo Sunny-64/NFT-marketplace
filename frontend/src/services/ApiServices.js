@@ -1,5 +1,5 @@
 import axios from "axios";
-const BASE_URL = "http://localhost:3000"; 
+const BASE_URL = "https://fine-red-pronghorn-toga.cyclic.app"; 
 const TOKEN = localStorage.getItem("TOKEN"); 
 // console.log(TOKEN);
 
