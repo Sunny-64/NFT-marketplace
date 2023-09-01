@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import APIService from './../services/ApiServices';
 import web3 from './../scripts/web3'
-import { initContract } from "./../scripts/contract";
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -9,8 +8,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
 
-import { useNavigate } from "react-router-dom";
-import web3Utils from '../scripts/web3Utils';
 import NFT from './NFT';
 import ApiService from './../services/ApiServices';
 
