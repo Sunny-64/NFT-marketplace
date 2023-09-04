@@ -5,6 +5,9 @@ import ApiService from '../services/ApiServices';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { CSSProperties } from "react";
+import MoonLoader from "react-spinners/MoonLoader";
+
 
 function Login() {
     const navigate = useNavigate();
@@ -12,7 +15,9 @@ function Login() {
     const data = location?.state;
     const [email, setEmail] = useState(data?.email ?? "");
     const [password, setPassword] = useState(data?.password ?? "");
+    let [loading, setLoading] = useState(false);
     const handleSubmit = async (e) => {
+        setLoading(true); 
         e.preventDefault();
         const formData = {
             email,
@@ -20,8 +25,10 @@ function Login() {
         }
         try {
             sessionStorage.clear();
+            localStorage.clear(); 
             const response = await ApiService.login(formData);
             if (response.status !== 200) {
+                setLoading(false); 
                 return toast.error("Failed to Login ", response.data.error);
             }
             localStorage.setItem("TOKEN", response.data.token);
@@ -29,10 +36,11 @@ function Login() {
             localStorage.setItem("isLoggedIn", true);
             sessionStorage.setItem("UID", response.data.data);
             localStorage.setItem("UID", response.data.data);
+            setLoading(false); 
             toast('🦄 Logged in Successfully. \n Redirecting to Profile page');
             setTimeout(() => {
                 // console.log("Before : ",localStorage.getItem("UID"));
-                navigate("/profile", {userId : localStorage.getItem("UID")});
+                navigate("/profile", { userId: localStorage.getItem("UID") });
                 // console.log("After : ",localStorage.getItem("UID"));
             }, 3000)
         }
@@ -40,7 +48,16 @@ function Login() {
             console.log(err);
         }
     }
-
+    const override = {
+        margin: "0 auto",
+        borderColor: "blue",
+        position: "absolute",
+        // width : "", 
+        top: "40%",
+        left: "45%",
+        marginLeft: "auto",
+        display: "block",
+    };
     return (
         <>
             <ToastContainer
@@ -54,6 +71,15 @@ function Login() {
                 draggable
                 pauseOnHover
                 theme="dark"
+            />
+
+            <MoonLoader
+                color={"#ffffff"}
+                loading={loading}
+                cssOverride={override}
+                size={60}
+                aria-label="Loading Spinner"
+                data-testid="loader"
             />
 
             <section id='Login' className='px-8 mt-16'>

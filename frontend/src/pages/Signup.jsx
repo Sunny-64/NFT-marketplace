@@ -3,67 +3,92 @@ import ApiService from '../services/ApiServices';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, Link } from "react-router-dom";
+import { CSSProperties } from "react";
+import MoonLoader from "react-spinners/MoonLoader";
 
 function Signup() {
 
-    const [username, setUsername] = useState(""); 
-    const [email, setEmail] = useState(""); 
-    const [mobile, setMobile] = useState(""); 
-    const [password, setPassword] = useState(""); 
-    const navigate = useNavigate(); 
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [mobile, setMobile] = useState("");
+    const [password, setPassword] = useState("");
+    let [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); 
-        try{
+        e.preventDefault();
+        setLoading(true); 
+        try {
             const user = {
-                username, 
-                email, 
-                mobile, 
+                username,
+                email,
+                mobile,
                 password
             }
 
-            const response = await ApiService.register(user); 
+            const response = await ApiService.register(user);
             // console.log(response);
-            if(response.status !== 200){
+            if (response.status !== 200) {
+                setLoading(false); 
                 // console.log("Registration failed"); 
-                return toast(`Failed to Sign up ${response.data.error ?? response.data.message}`)
+                toast(`Failed to Sign up ${response.data.error ?? response.data.message}`)
             }
-            toast('🦄 Registered Successfully. \n Redirecting to Login page'); 
+            setLoading(false); 
+            toast('🦄 Registered Successfully. \n Redirecting to Login page');
             const data = {
-                email, 
+                email,
                 password
             };
             setTimeout(() => {
                 // console.log("Inside the setTimeout");
-                navigate("/login", {state : data}) 
-              }, 5000);
+                navigate("/login", { state: data })
+            }, 3000);
         }
-        catch(err){
-            console.log(err); 
+        catch (err) {
+            console.log(err);
         }
 
     }
+    const override = {
+        margin: "0 auto",
+        borderColor: "blue",
+        position: "absolute",
+        // width : "", 
+        top: "40%",
+        left: "45%",
+        marginLeft: "auto",
+        display: "block",
+    };
     return (
-    <>
-        <ToastContainer
-            position="top-right"
-            autoClose={2000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-        />
-        <section id='Signup' className='px-8 mt-16'>
+        <>
+            <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
+
+            <MoonLoader
+                color={"#ffffff"}
+                loading={loading}
+                cssOverride={override}
+                size={60}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+            />
+            <section id='Signup' className='px-8 mt-16'>
                 <div className='flex justify-center border-white border-2 flex-col items-center md:w-[40%] xs:w-[80%] xs:px-4 md:px-0 mx-auto py-8 rounded-lg'>
-                <h2 className='text-3xl font-semibold mb-8 text-center'>Sign Up</h2>
+                    <h2 className='text-3xl font-semibold mb-8 text-center'>Sign Up</h2>
                     <form action="" encType='multipart/form-data' className='md:w-[80%] sm:w-full' onSubmit={handleSubmit}>
                         <div className='mb-3 flex flex-col'>
                             <label htmlFor="username">Username</label>
-                            <input type="text" pattern='^[A-Za-z]+$' id='username' name='username' className='py-2 rounded-md text-black px-4' required value={username} onChange={(e) => setUsername(e.target.value)}/>
+                            <input type="text" pattern='^[A-Za-z]+$' id='username' name='username' className='py-2 rounded-md text-black px-4' required value={username} onChange={(e) => setUsername(e.target.value)} />
                         </div>
                         <div className='flex flex-col mb-3'>
                             <label htmlFor="email">Email</label>
@@ -71,11 +96,11 @@ function Signup() {
                         </div>
                         <div className='flex flex-col mb-3'>
                             <label htmlFor="mobile">Mobile</label>
-                            <input type="text" pattern="[789][0-9]{9}" name='mobile' id='mobile' className='py-2 rounded-md text-black px-4' required value={mobile} onChange={(e) => setMobile(e.target.value)}/>
+                            <input type="text" pattern="[789][0-9]{9}" name='mobile' id='mobile' className='py-2 rounded-md text-black px-4' required value={mobile} onChange={(e) => setMobile(e.target.value)} />
                         </div>
                         <div className='mb-3 flex flex-col content-start'>
                             <label htmlFor="password">Password</label>
-                            <input type="password" className='py-2 rounded-md text-black px-4' required id='password' value={password} onChange={(e) => setPassword(e.target.value)}/>
+                            <input type="password" className='py-2 rounded-md text-black px-4' required id='password' value={password} onChange={(e) => setPassword(e.target.value)} />
                         </div>
                         <div className='mb-3 mt-5 flex justify-between'>
                             <button className='py-2 px-8 rounded-md btn-primary'>Signup</button>
