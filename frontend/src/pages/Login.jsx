@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 function Login() {
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const location = useLocation();
     const data = location?.state;
     const [email, setEmail] = useState(data?.email ?? "");
@@ -15,24 +15,25 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = {
-            email, 
+            email,
             password
         }
-        try{
-            sessionStorage.clear(); 
+        try {
+            sessionStorage.clear();
             const response = await ApiService.login(formData);
             if (response.status !== 200) {
-                return toast.error("Failed to Login ", response.data.error); 
+                return toast.error("Failed to Login ", response.data.error);
             }
-            localStorage.setItem("TOKEN", response.data.token);
-            sessionStorage.setItem("isLoggedIn", true); 
-            sessionStorage.setItem("UID", response.data.data); 
+
             toast('🦄 Logged in Successfully. \n Redirecting to Profile page');
             setTimeout(() => {
-                navigate("/profile"); 
+                localStorage.setItem("TOKEN", response.data.token);
+                sessionStorage.setItem("isLoggedIn", true);
+                sessionStorage.setItem("UID", response.data.data);
+                navigate("/profile");
             }, 5000)
         }
-        catch(err){
+        catch (err) {
             console.log(err);
         }
     }
