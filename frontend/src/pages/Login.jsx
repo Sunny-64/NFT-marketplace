@@ -24,14 +24,17 @@ function Login() {
             if (response.status !== 200) {
                 return toast.error("Failed to Login ", response.data.error);
             }
-
+            localStorage.setItem("TOKEN", response.data.token);
+            sessionStorage.setItem("isLoggedIn", true);
+            localStorage.setItem("isLoggedIn", true);
+            sessionStorage.setItem("UID", response.data.data);
+            localStorage.setItem("UID", response.data.data);
             toast('🦄 Logged in Successfully. \n Redirecting to Profile page');
             setTimeout(() => {
-                localStorage.setItem("TOKEN", response.data.token);
-                sessionStorage.setItem("isLoggedIn", true);
-                sessionStorage.setItem("UID", response.data.data);
-                navigate("/profile");
-            }, 5000)
+                // console.log("Before : ",localStorage.getItem("UID"));
+                navigate("/profile", {userId : localStorage.getItem("UID")});
+                // console.log("After : ",localStorage.getItem("UID"));
+            }, 3000)
         }
         catch (err) {
             console.log(err);

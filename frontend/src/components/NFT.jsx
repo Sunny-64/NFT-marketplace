@@ -35,7 +35,7 @@ function NFT(props) {
         });
     }, [])
 
-    const purchaseNFT = async (index, price) => {
+    const purchaseNFT = async (index, price, owner) => {
         if (!sessionStorage.getItem("isLoggedIn")) {
             return toast.error("You have to login to purchase the NFT");
         }
@@ -44,13 +44,15 @@ function NFT(props) {
             const accounts = await web3.eth.getAccounts();
             setLoading(true);
 
-            const saveTx = await APIService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "purchase" });
-            console.log(saveTx);
-
+           
             const purchase = await contract.methods.purchaseNFT(index).send({
                 from: accounts[0],
                 value: price
             });
+            
+            console.log(purchase);
+            const saveTx = await APIService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "purchase" });
+            console.log(saveTx);
             setLoading(false);
 
             console.log("tx", purchase);
@@ -85,7 +87,7 @@ function NFT(props) {
                 </div>
                 <div className='flex justify-between items-center mt-3'>
                     <p><span className='opacity-80'>Category :</span> <span className='font-semibold'>{props.category}</span></p>
-                    {props.owner !== accounts[0] && <button className='py-2 rounded-md btn-primary px-3' onClick={() => purchaseNFT(props.tokenId, props.price)}>Purchase</button>}
+                    {props.owner !== accounts[0] && <button className='py-2 rounded-md btn-primary px-3' onClick={() => purchaseNFT(props.tokenId, props.price, props.owner)}>Purchase</button>}
                 </div>
             </div>
         </>

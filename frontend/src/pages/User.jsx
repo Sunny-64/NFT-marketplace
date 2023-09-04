@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import ApiService from '../services/ApiServices';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation} from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import web3 from './../scripts/web3';
 import { initContract } from "./../scripts/contract";
@@ -10,11 +10,14 @@ import MoonLoader from "react-spinners/MoonLoader";
 import Countdown from '../components/Countdown';
 
 function User() {
+  // console.log("in user page : ", localStorage.getItem("UID"));
   const navigate = useNavigate();
   // console.log(sessionStorage.getItem("isLoggedIn"));
   if (!localStorage.getItem("TOKEN") || !web3) {
     navigate("/");
   }
+
+  // console.log(localStorage.getItem("UID")); 
   const [userData, setUserData] = useState();
   const [userNfts, setUserNfts] = useState();
   const [contract, setContract] = useState("");
@@ -26,22 +29,28 @@ function User() {
   let [loading, setLoading] = useState(false);
   const [txAmount, setTxAmount] = useState(); 
   const [accounts, setAccounts] = useState([]); 
+  const {userId} = useLocation(); 
+  console.log(userId);
 
   useEffect(() => {
     const fetchData = async () => {
-      const fetchAccounts = await web3.eth.getAccounts();
-      const response = await ApiService.getUser(sessionStorage.getItem("UID"));
+      // console.log(localStorage.getItem("UID")); 
+      if(!userId){
+        return; 
+      }
+      const response = await ApiService.getUser(userId);
       if (response.status !== 200) {
         return toast.error(response.data.error);
       }
       setUserData(response.data.data);
-
+      
       if (!web3) {
         return;
       }
+      const fetchAccounts = await web3.eth.getAccounts();
       setLoading(true);
       const nfts = await ApiService.getUserNFTs(fetchAccounts[0]);
-      console.log("NFTss : ", nfts);
+      // console.log("User NFTss : ", nfts);
       setUserNfts(nfts.data.data);
       setLoading(false);
     }
@@ -53,7 +62,7 @@ function User() {
       .then(async (contractInstance) => {
         if (contractInstance) {
           // Contract initialized successfully
-          console.log("Contract initialized.");
+          // console.log("Contract initialized.");
           setContract(contractInstance)
           setAccounts(await web3.eth.getAccounts()); 
 

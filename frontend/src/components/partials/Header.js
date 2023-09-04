@@ -9,6 +9,7 @@ function Header() {
     const confirm = window.confirm("Are you sure you want to logout")
     if(confirm){
       sessionStorage.clear(); 
+      localStorage.clear(); 
       navigate("/"); 
     }
   }

@@ -31,7 +31,12 @@ function MintNFT() {
 
     const handleSubmit = async (e) => {
         if (!sessionStorage.getItem("isLoggedIn")) {
-            return toast.error("please login first");
+            toast.error("please login first");
+            return;
+        }
+        if(!web3){
+            alert("Please install metaMask first"); 
+            return;
         }
         e.preventDefault();
         try {

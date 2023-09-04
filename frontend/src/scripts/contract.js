@@ -8,7 +8,9 @@ let contract;
 export const initContract = async () => {
   try {
     if (!web3) {
+      alert("Please Install Metamask first"); 
       throw new Error("Metamask not installed");
+      
     }
     contract = await new web3.eth.Contract(ABI.abi, CONTRACT_ADDRESS);
     return contract;

@@ -12,7 +12,7 @@ const initWeb3 = async () => {
       web3 = new Web3(window.ethereum);
     } else {
       if (typeof process !== "undefined") {
-        console.log("Metamask not installed. Please install Metamask to use this website's Ethereum features.");
+        console.log("Metamask not installedD. Please install Metamask to use this website's Ethereum features.");
       }
       web3 = null; // Set web3 to null if Metamask is not available.
     }

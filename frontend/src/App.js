@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import Search from './pages/Search';
 import PageNotFound from './pages/PageNotFound';
 
+console.log(localStorage.getItem("isLoggedIn"));
 const router = createBrowserRouter([
   {
     element: <Layout />,
@@ -34,7 +35,7 @@ const router = createBrowserRouter([
       }, 
       {
         path : "/profile",
-        element : sessionStorage.getItem("isLoggedIn") ? <User /> : <PageNotFound />
+        element : <User />
       },
       {
         path : "/search",
