@@ -1,9 +1,5 @@
-import { useState } from 'react'
-import './App.css'
 import Layout from './Layout';
-import NFTs from './components/NFTs';
 import User from './pages/User'; 
-// import {Web3Provider} from './scripts/web3'; 
 
 import {
   createBrowserRouter,
