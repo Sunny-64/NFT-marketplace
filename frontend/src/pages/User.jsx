@@ -12,9 +12,7 @@ import Countdown from '../components/Countdown';
 function User() {
   const navigate = useNavigate();
   // console.log(sessionStorage.getItem("isLoggedIn"));
-  if (!localStorage.getItem("TOKEN") || !web3) {
-    navigate("/");
-  }
+ 
   const [userData, setUserData] = useState();
   const [userNfts, setUserNfts] = useState();
   const [contract, setContract] = useState("");
@@ -28,6 +26,9 @@ function User() {
   const [accounts, setAccounts] = useState([]); 
 
   useEffect(() => {
+    if (!localStorage.getItem("TOKEN") || !web3) {
+      navigate("/");
+    }
     const fetchData = async () => {
       // console.log(localStorage.getItem("UID")); 
       const response = await ApiService.getUser(localStorage.getItem("UID"));
@@ -40,6 +41,10 @@ function User() {
         return;
       }
       const fetchAccounts = await web3.eth.getAccounts();
+      if(!fetchAccounts[0]){
+        toast.error("Please Install Metamask first"); 
+        return; 
+      }
       setLoading(true);
       const nfts = await ApiService.getUserNFTs(fetchAccounts[0]);
       console.log("User NFTss : ", nfts);
@@ -207,11 +212,16 @@ function User() {
   useEffect(() => {
     // fetch user transactions...
     const fetchData = async () => {
-      setLoading(true);
-      const fetchTxs = await ApiService.getTxHistory();
-      setLoading(false);
-      console.log(fetchTxs.data.data);
-      setTxs(fetchTxs.data.data);
+     try{
+        setLoading(true);
+        const fetchTxs = await ApiService.getTxHistory();
+        setLoading(false);
+        console.log(fetchTxs?.data?.data);
+        setTxs(fetchTxs?.data?.data);
+     }
+     catch(err){
+        console.log(err);
+     }
     }
     fetchData();
   }, [])
@@ -278,8 +288,8 @@ function User() {
           return (
             <div key={index} className='card col-span-1 bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6'>
               {/* <p className='break-words'>Owner: {item[0]}</p> */}
-              <p>name : {item.name}</p>
-              <p className='break-words'>Description : {item.description}</p>
+              <p>name : {item?.name}</p>
+              <p className='break-words'>Description : {item?.description}</p>
               <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
               <div className='flex justify-between'>
                 {/* <p>Item Id : {item.tokenId}</p> */}
@@ -310,10 +320,10 @@ function User() {
         {txs?.map((item, key) => {
             return (
               <div key={key} className='gap-10 tx py-2 px-4 inline-flex rounded-lg col-span-1'>
-                <p>Token Id : {item.tokenId}</p>
+                <p>Token Id : {item?.tokenId}</p>
                 {/* {setTxAmount(item?.transactionAmount ?? "xx")} */}
                 {/* <p>Transaction Amount : {web3.utils.fromWei(item.transactionAmount, "ether")} ETH</p> */}
-                <p>Transaction Type : {item.transactionType}</p>
+                <p>Transaction Type : {item?.transactionType}</p>
               </div>
             )
           })}

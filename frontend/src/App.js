@@ -16,6 +16,7 @@ import PageNotFound from './pages/PageNotFound';
 // Define a custom ProtectedRoute component
 function ProtectedRoute({ component: Component, ...rest }) {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
+  const UID = localStorage.getItem("UID");
 
   // You can customize the redirection logic here
   if (!isLoggedIn) {
