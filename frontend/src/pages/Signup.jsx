@@ -3,15 +3,12 @@ import ApiService from '../services/ApiServices';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, Link } from "react-router-dom";
-import { CSSProperties } from "react";
-import MoonLoader from "react-spinners/MoonLoader";
 
 import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
 
 function Signup() {
 
-<<<<<<< HEAD
     const [username, setUsername] = useState(""); 
     const [email, setEmail] = useState(""); 
     const [mobile, setMobile] = useState(""); 
@@ -24,19 +21,6 @@ function Signup() {
         e.preventDefault(); 
         setLoading(true); 
         try{
-=======
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [mobile, setMobile] = useState("");
-    const [password, setPassword] = useState("");
-    let [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true); 
-        try {
->>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
             const user = {
                 username,
                 email,
@@ -49,18 +33,11 @@ function Signup() {
             if (response.status !== 200) {
                 setLoading(false); 
                 // console.log("Registration failed"); 
-<<<<<<< HEAD
                 setLoading(false); 
                 return toast(`Failed to Sign up ${response.data.error ?? response.data.message}`)
             }
             setLoading(false); 
             toast('🦄 Registered Successfully. \n Redirecting to Login page'); 
-=======
-                toast(`Failed to Sign up ${response.data.error ?? response.data.message}`)
-            }
-            setLoading(false); 
-            toast('🦄 Registered Successfully. \n Redirecting to Login page');
->>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
             const data = {
                 email,
                 password
@@ -75,17 +52,12 @@ function Signup() {
         }
 
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
     const override = {
         margin: "0 auto",
         borderColor: "blue",
         position: "absolute",
         // width : "", 
         top: "40%",
-<<<<<<< HEAD
         left : "45%",
         marginLeft: "auto",
         display: "block",
@@ -114,36 +86,6 @@ function Signup() {
             theme="dark"
         />
         <section id='Signup' className='px-8 mt-16'>
-=======
-        left: "45%",
-        marginLeft: "auto",
-        display: "block",
-    };
-    return (
-        <>
-            <ToastContainer
-                position="top-right"
-                autoClose={2000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="dark"
-            />
-
-            <MoonLoader
-                color={"#ffffff"}
-                loading={loading}
-                cssOverride={override}
-                size={60}
-                aria-label="Loading Spinner"
-                data-testid="loader"
-            />
-            <section id='Signup' className='px-8 mt-16'>
->>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
                 <div className='flex justify-center border-white border-2 flex-col items-center md:w-[40%] xs:w-[80%] xs:px-4 md:px-0 mx-auto py-8 rounded-lg'>
                     <h2 className='text-3xl font-semibold mb-8 text-center'>Sign Up</h2>
                     <form action="" encType='multipart/form-data' className='md:w-[80%] sm:w-full' onSubmit={handleSubmit}>

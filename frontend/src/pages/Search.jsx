@@ -20,7 +20,6 @@ function Search() {
   let [loading, setLoading] = useState(false);
 
   useEffect(() => {
-<<<<<<< HEAD
     initContract()
       .then((contractInstance) => {
         if (contractInstance) {
@@ -37,8 +36,6 @@ function Search() {
         console.log(err);
       });
 
-=======
->>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
       const fetchData = async () => {
         // fetch categories
         setLoading(true); 

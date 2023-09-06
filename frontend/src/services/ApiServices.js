@@ -1,6 +1,6 @@
 import axios from "axios";
-// const BASE_URL = "https://fine-red-pronghorn-toga.cyclic.app";
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://fine-red-pronghorn-toga.cyclic.app";
+// const BASE_URL = "http://localhost:3000";
 // const TOKEN = localStorage.getItem("TOKEN") ?? sessionStorage.getItem("TOKEN");
 // console.log("Token in service file : ", TOKEN);
 const getAuthToken = () => {

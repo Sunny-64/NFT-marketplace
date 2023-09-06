@@ -13,13 +13,9 @@ import axios from 'axios';
 function User(props) {
   const navigate = useNavigate();
   // console.log(sessionStorage.getItem("isLoggedIn"));
-<<<<<<< HEAD
   if (!localStorage.getItem("TOKEN")) {
     navigate("/");
   }
-=======
- 
->>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
   const [userData, setUserData] = useState();
   const [userNfts, setUserNfts] = useState();
   const [contract, setContract] = useState("");
@@ -31,18 +27,20 @@ function User(props) {
   let [loading, setLoading] = useState(false);
   const [txAmount, setTxAmount] = useState();
   const [accounts, setAccounts] = useState([]);
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState(sessionStorage.getItem("UID"));
   const [web3, setWeb3] = useState({}); 
+
   useEffect(() => {
-<<<<<<< HEAD
     // console.log("useEffect executed...");
     setUserId(sessionStorage.getItem("UID"));
+    // console.log(userId)
     const fetchData = async () => {
       try {
-        const fetchAccounts = await web3?.eth?.getAccounts();
+        setLoading(true); 
         // console.log(userId);
-        let url = `http://localhost:3000/users/${userId}`;
+        let url = `https://fine-red-pronghorn-toga.cyclic.app/users/${userId}`;
         // console.log(localStorage.getItem("TOKEN"));
+        // console.log(url);
         const response = await axios.get(url, {headers : {
             'Accept' : "application/json",
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
@@ -51,59 +49,40 @@ function User(props) {
           return toast.error(response.data.error);
         }
         setUserData(response.data.data);
-
-        if (!web3) {
-          return;
-        }
-        setLoading(true);
-        const nfts = await ApiService.getUserNFTs(fetchAccounts[0]);
-        // console.log("user NFTss : ", nfts);
-        setUserNfts(nfts.data.data);
         setLoading(false);
       }
       catch (err) {
         console.log(err);
       }
-=======
-    if (!localStorage.getItem("TOKEN") || !web3) {
-      navigate("/");
-    }
-    const fetchData = async () => {
-      // console.log(localStorage.getItem("UID")); 
-      const response = await ApiService.getUser(localStorage.getItem("UID"));
-      if (response.status !== 200) {
-        return toast.error(response.data.error);
-      }
-      setUserData(response.data.data);
-      
-      if (!web3) {
-        return;
-      }
-      const fetchAccounts = await web3.eth.getAccounts();
-      if(!fetchAccounts[0]){
-        toast.error("Please Install Metamask first"); 
-        return; 
-      }
-      setLoading(true);
-      const nfts = await ApiService.getUserNFTs(fetchAccounts[0]);
-      console.log("User NFTss : ", nfts);
-      setUserNfts(nfts.data.data);
-      setLoading(false);
->>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
     }
     fetchData();
-  }, [userId]);
+  }, [userId, web3]);
 
   useEffect(() => {
     // setup web3..
+    setLoading(true);
     initWeb3()
     .then(web3Instance => {
+      // console.log("initialized web3 in profile page...", web3Instance);
       setWeb3(web3Instance); 
-      // console.log("initialized web3 in profile page...", web3);
+      const fetchUserNfts = async () => {
+        try{
+          const fetchAccounts = await web3Instance?.eth?.getAccounts();
+          const nfts = await ApiService.getUserNFTs(fetchAccounts[0]);
+          // console.log(fetchAccounts);
+          setUserNfts(nfts.data.data);
+          setLoading(false);
+        }
+        catch(err){
+          console.log(err);
+        }
+      }
+      fetchUserNfts(); 
     })
     .catch(err => {
       console.log(err);
     })
+    
     initContract()
       .then( (contractInstance) => {
         if (contractInstance) {
@@ -133,10 +112,6 @@ function User(props) {
       setLoading(true);
       const getMetaMaskAccounts = await web3.eth.getAccounts();
 
-      // console.log("price : ", price, typeof price,);
-      // console.log("Index : ", index, typeof index,);
-      // console.log("acc : ", getMetaMaskAccounts[0]);
-
       const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3.utils.toWei(price, "ether"), transactionType: "sell" });
       console.log(saveTx);
 
@@ -146,7 +121,6 @@ function User(props) {
 
       setLoading(false);
       toast.success("NFT listed for Sale");
-      // console.log("NFT is Now Listed For Sale : ", listNft);
       navigate("/");
     }
     catch (err) {
@@ -260,10 +234,9 @@ function User(props) {
   useEffect(() => {
     // fetch user transactions...
     const fetchData = async () => {
-<<<<<<< HEAD
       try {
         setLoading(true);
-        let url = `http://localhost:3000/nfts/user/txs`; 
+        let url = `https://fine-red-pronghorn-toga.cyclic.app/nfts/user/txs`; 
         const fetchTxs = await axios.get(url, {headers: {
           Accept: "application/json",
           Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
@@ -275,18 +248,6 @@ function User(props) {
       catch (err) {
         console.log(err);
       }
-=======
-     try{
-        setLoading(true);
-        const fetchTxs = await ApiService.getTxHistory();
-        setLoading(false);
-        console.log(fetchTxs?.data?.data);
-        setTxs(fetchTxs?.data?.data);
-     }
-     catch(err){
-        console.log(err);
-     }
->>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
     }
     fetchData();
   }, [])
@@ -349,17 +310,12 @@ function User(props) {
 
       <div className='mt-8 grid lg:grid-cols-4 gap-3 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 px-4 '>
         {userNfts?.length < 0 ? "you do not have any nfts.." :  userNfts?.map((item, index) => {
-          {/* console.log(item); */ }
           return (
             <div key={index} className='card col-span-1 bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6'>
               {/* <p className='break-words'>Owner: {item[0]}</p> */}
               <p>name : {item?.name}</p>
               <p className='break-words'>Description : {item?.description}</p>
-<<<<<<< HEAD
               <img src={item?.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
-=======
-              <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
->>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
               <div className='flex justify-between'>
                 {/* <p>Item Id : {item.tokenId}</p> */}
                 {Boolean(item?.isListedForSale) && <p>Price : {Number(web3.utils.fromWei(item?.price, "ether"))} ETH</p>}
