@@ -13,9 +13,13 @@ import axios from 'axios';
 function User(props) {
   const navigate = useNavigate();
   // console.log(sessionStorage.getItem("isLoggedIn"));
+<<<<<<< HEAD
   if (!localStorage.getItem("TOKEN")) {
     navigate("/");
   }
+=======
+ 
+>>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
   const [userData, setUserData] = useState();
   const [userNfts, setUserNfts] = useState();
   const [contract, setContract] = useState("");
@@ -30,6 +34,7 @@ function User(props) {
   const [userId, setUserId] = useState("");
   const [web3, setWeb3] = useState({}); 
   useEffect(() => {
+<<<<<<< HEAD
     // console.log("useEffect executed...");
     setUserId(sessionStorage.getItem("UID"));
     const fetchData = async () => {
@@ -59,6 +64,32 @@ function User(props) {
       catch (err) {
         console.log(err);
       }
+=======
+    if (!localStorage.getItem("TOKEN") || !web3) {
+      navigate("/");
+    }
+    const fetchData = async () => {
+      // console.log(localStorage.getItem("UID")); 
+      const response = await ApiService.getUser(localStorage.getItem("UID"));
+      if (response.status !== 200) {
+        return toast.error(response.data.error);
+      }
+      setUserData(response.data.data);
+      
+      if (!web3) {
+        return;
+      }
+      const fetchAccounts = await web3.eth.getAccounts();
+      if(!fetchAccounts[0]){
+        toast.error("Please Install Metamask first"); 
+        return; 
+      }
+      setLoading(true);
+      const nfts = await ApiService.getUserNFTs(fetchAccounts[0]);
+      console.log("User NFTss : ", nfts);
+      setUserNfts(nfts.data.data);
+      setLoading(false);
+>>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
     }
     fetchData();
   }, [userId]);
@@ -229,6 +260,7 @@ function User(props) {
   useEffect(() => {
     // fetch user transactions...
     const fetchData = async () => {
+<<<<<<< HEAD
       try {
         setLoading(true);
         let url = `http://localhost:3000/nfts/user/txs`; 
@@ -243,6 +275,18 @@ function User(props) {
       catch (err) {
         console.log(err);
       }
+=======
+     try{
+        setLoading(true);
+        const fetchTxs = await ApiService.getTxHistory();
+        setLoading(false);
+        console.log(fetchTxs?.data?.data);
+        setTxs(fetchTxs?.data?.data);
+     }
+     catch(err){
+        console.log(err);
+     }
+>>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
     }
     fetchData();
   }, [])
@@ -311,7 +355,11 @@ function User(props) {
               {/* <p className='break-words'>Owner: {item[0]}</p> */}
               <p>name : {item?.name}</p>
               <p className='break-words'>Description : {item?.description}</p>
+<<<<<<< HEAD
               <img src={item?.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
+=======
+              <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
+>>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
               <div className='flex justify-between'>
                 {/* <p>Item Id : {item.tokenId}</p> */}
                 {Boolean(item?.isListedForSale) && <p>Price : {Number(web3.utils.fromWei(item?.price, "ether"))} ETH</p>}
@@ -341,10 +389,10 @@ function User(props) {
           {txs?.map((item, key) => {
             return (
               <div key={key} className='gap-10 tx py-2 px-4 inline-flex rounded-lg col-span-1'>
-                <p>Token Id : {item.tokenId}</p>
+                <p>Token Id : {item?.tokenId}</p>
                 {/* {setTxAmount(item?.transactionAmount ?? "xx")} */}
                 {/* <p>Transaction Amount : {web3.utils.fromWei(item.transactionAmount, "ether")} ETH</p> */}
-                <p>Transaction Type : {item.transactionType}</p>
+                <p>Transaction Type : {item?.transactionType}</p>
               </div>
             )
           })}

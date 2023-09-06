@@ -101,37 +101,42 @@ function AuctionNFTs() {
             />
 
 
-            <div className='flex justify-between'>
-                {auctions?.length > 0 ? <h3 className='font-semibold text-3xl mb-4'>Auction NFTs</h3> : <p className='mt-5'>No NFT's has been listed for Auction yet</p>}
-                <div className="dropdown absolute right-[5%]">
-                    <button className="dropbtn px-3 py-1 rounded-md">{priceOrderSelection}</button>
-                    <div className="dropdown-content rounded-md hover:rounded-md">
-                        <p className='cursor-pointer' onClick={() => handleSortByPrice("highToLow")}>High to Low</p>
-                        <p className='cursor-pointer' onClick={() => handleSortByPrice("lowToHigh")}>Low to High</p>
+            {
+                auctions.length > 0 &&
+                <>
+                    <div className='flex justify-between'>
+                        {auctions?.length > 0 ? <h3 className='font-semibold text-3xl mb-4'>Auction NFTs</h3> : <p className='mt-5'>No NFT's has been listed for Auction yet</p>}
+                        <div className="dropdown absolute right-[5%]">
+                            <button className="dropbtn px-3 py-1 rounded-md">{priceOrderSelection}</button>
+                            <div className="dropdown-content rounded-md hover:rounded-md">
+                                <p className='cursor-pointer' onClick={() => handleSortByPrice("highToLow")}>High to Low</p>
+                                <p className='cursor-pointer' onClick={() => handleSortByPrice("lowToHigh")}>Low to High</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1'>
-                {
-                    auctions?.map((item, index) => {
-                        return getRemainingTime(item.endTime) > 0 &&
+                    <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1'>
+                        {
+                            auctions?.map((item, index) => {
+                                return getRemainingTime(item.endTime) > 0 &&
 
-                            <AuctionNFT
-                                key={index}
-                                tokenName={item.tokenName}
-                                tokenDescription={item.tokenDescription}
-                                tokenURI={item.tokenURI}
-                                highestBid={item.highestBid}
-                                startingPrice={item.startingPrice}
-                                category={item.category}
-                                endTime={item.endTime}
-                                creator={item.creator}
-                                index={index}
-                            />
+                                    <AuctionNFT
+                                        key={index}
+                                        tokenName={item.tokenName}
+                                        tokenDescription={item.tokenDescription}
+                                        tokenURI={item.tokenURI}
+                                        highestBid={item.highestBid}
+                                        startingPrice={item.startingPrice}
+                                        category={item.category}
+                                        endTime={item.endTime}
+                                        creator={item.creator}
+                                        index={index}
+                                    />
 
-                    })
-                }
-            </div>
+                            })
+                        }
+                    </div>
+                </>
+            }
         </>
     )
 }

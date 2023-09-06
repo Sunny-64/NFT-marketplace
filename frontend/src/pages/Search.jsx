@@ -20,6 +20,7 @@ function Search() {
   let [loading, setLoading] = useState(false);
 
   useEffect(() => {
+<<<<<<< HEAD
     initContract()
       .then((contractInstance) => {
         if (contractInstance) {
@@ -36,6 +37,8 @@ function Search() {
         console.log(err);
       });
 
+=======
+>>>>>>> bd9e2207d1eae362fea9f20c7c0582048614a208
       const fetchData = async () => {
         // fetch categories
         setLoading(true); 
@@ -59,6 +62,23 @@ function Search() {
   }
 
   const purchaseNFT = async (index, price) => {
+    
+    initContract()
+      .then((contractInstance) => {
+        if (contractInstance) {
+          // Contract initialized successfully
+          console.log("Contract initialized.");
+          setContract(contractInstance)
+
+        } else {
+          // Handle the case when the contract could not be initialized
+          console.log("Failed to initialize contract.");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     if (!sessionStorage.getItem("isLoggedIn")) {
       return toast.error("You have to login to purchase the NFT");
     }
