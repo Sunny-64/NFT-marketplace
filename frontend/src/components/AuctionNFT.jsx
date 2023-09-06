@@ -1,5 +1,5 @@
 import {React, useState, useEffect} from 'react'
-import web3 from '../scripts/web3';
+import initWeb3 from '../scripts/web3';
 import web3Utils from '../scripts/web3Utils';
 import { initContract } from '../scripts/contract';
 import ApiService from '../services/ApiServices';
@@ -15,8 +15,18 @@ function AuctionNFT(props) {
     let [loading, setLoading] = useState(false);
     const [contract, setContract] = useState({});
     const [accounts,setAccounts] = useState([]); 
+    const [web3, setWeb3] = useState({}); 
     // console.log(props.endTime);
     useEffect(() => {
+        // set web3...
+        initWeb3()
+        .then(web3Instance => {
+            setWeb3(web3Instance) 
+        })
+        .catch(err => {
+            console.log(err);
+        }); 
+
         initContract()
         .then(async (contractInstance) => {
           if (contractInstance) {

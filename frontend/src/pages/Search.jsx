@@ -24,7 +24,7 @@ function Search() {
       .then((contractInstance) => {
         if (contractInstance) {
           // Contract initialized successfully
-          console.log("Contract initialized.");
+          // console.log("Contract initialized.");
           setContract(contractInstance)
 
         } else {
@@ -40,7 +40,7 @@ function Search() {
         // fetch categories
         setLoading(true); 
         const fetchCategories = await ApiService.getCategories(); 
-        console.log(fetchCategories.data.data);
+        // console.log(fetchCategories.data.data);
         setCategories(fetchCategories.data.data); 
         setLoading(false); 
       }
@@ -48,7 +48,7 @@ function Search() {
       fetchData(); 
 
   }, [])
-  console.log(categories);
+  // console.log(categories);
 
   const filterByCategory = async (category) =>{
       setLoading(true); 
@@ -71,7 +71,7 @@ function Search() {
         value: price
       });
       
-      console.log("tx", purchase);
+      // console.log("tx", purchase);
       setLoading(false);
     }
     catch (err) {
@@ -86,7 +86,7 @@ function Search() {
       }
       setLoading(true); 
       const data = await ApiService.searchByName(name); 
-      console.log(data);
+      // console.log(data);
       setNfts(data.data.data); 
       setLoading(false); 
   }

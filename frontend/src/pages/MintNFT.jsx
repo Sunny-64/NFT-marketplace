@@ -36,7 +36,10 @@ function MintNFT() {
         e.preventDefault();
         try {
             // Upload image to firebase and get the image url...
-
+            if(!contract || !web3){
+                toast.error("Please login into metamask first"); 
+                return; 
+            }
             if (!image) {
                 return;
             }

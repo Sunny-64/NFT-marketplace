@@ -1,6 +1,6 @@
 import {React, useState, useEffect} from 'react'
 import web3Utils from '../scripts/web3Utils'
-import web3 from '../scripts/web3';
+import initWeb3 from '../scripts/web3';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,8 +15,18 @@ function NFT(props) {
     const [contract, setContract] = useState("");
     let [loading, setLoading] = useState(false);
     let [accounts, setAccounts] = useState([]); 
+    const [web3, setWeb3] = useState({}); 
 
     useEffect(() => {
+        // initialize web3.. 
+        initWeb3()
+        .then(web3Instance => {
+            setWeb3(web3Instance); 
+        })
+        .catch(err => {
+            console.log(err);
+        }); 
+        
         initContract()
         .then(async (contractInstance) => {
           if (contractInstance) {
@@ -39,7 +49,6 @@ function NFT(props) {
         if (!sessionStorage.getItem("isLoggedIn")) {
             return toast.error("You have to login to purchase the NFT");
         }
-
         try {
             const accounts = await web3.eth.getAccounts();
             setLoading(true);

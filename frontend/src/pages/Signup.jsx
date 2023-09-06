@@ -4,6 +4,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, Link } from "react-router-dom";
 
+import { CSSProperties } from "react";
+import MoonLoader from "react-spinners/MoonLoader";
+
 function Signup() {
 
     const [username, setUsername] = useState(""); 
@@ -11,9 +14,12 @@ function Signup() {
     const [mobile, setMobile] = useState(""); 
     const [password, setPassword] = useState(""); 
     const navigate = useNavigate(); 
+  let [loading, setLoading] = useState(false);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault(); 
+        setLoading(true); 
         try{
             const user = {
                 username, 
@@ -26,8 +32,10 @@ function Signup() {
             // console.log(response);
             if(response.status !== 200){
                 // console.log("Registration failed"); 
+                setLoading(false); 
                 return toast(`Failed to Sign up ${response.data.error ?? response.data.message}`)
             }
+            setLoading(false); 
             toast('🦄 Registered Successfully. \n Redirecting to Login page'); 
             const data = {
                 email, 
@@ -43,8 +51,28 @@ function Signup() {
         }
 
     }
+
+    const override = {
+        margin: "0 auto",
+        borderColor: "blue",
+        position: "absolute",
+        // width : "", 
+        top: "40%",
+        left : "45%",
+        marginLeft: "auto",
+        display: "block",
+        zIndex : "199"
+      };
     return (
     <>
+     <MoonLoader
+          color={"#ffffff"}
+          loading={loading}
+          cssOverride={override}
+          size={60}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
         <ToastContainer
             position="top-right"
             autoClose={2000}

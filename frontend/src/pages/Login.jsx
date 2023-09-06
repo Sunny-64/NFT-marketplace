@@ -5,6 +5,8 @@ import ApiService from '../services/ApiServices';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { CSSProperties } from "react";
+import MoonLoader from "react-spinners/MoonLoader";
 
 function Login() {
     const navigate = useNavigate(); 
@@ -12,24 +14,33 @@ function Login() {
     const data = location?.state;
     const [email, setEmail] = useState(data?.email ?? "");
     const [password, setPassword] = useState(data?.password ?? "");
+    let [loading, setLoading] = useState(false);
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         const formData = {
             email, 
             password
         }
         try{
             sessionStorage.clear(); 
+            localStorage.clear(); 
             const response = await ApiService.login(formData);
             if (response.status !== 200) {
+                setLoading(false); 
                 return toast.error("Failed to Login ", response.data.error); 
             }
             localStorage.setItem("TOKEN", response.data.token);
+            sessionStorage.setItem("TOKEN", response.data.token); 
             sessionStorage.setItem("isLoggedIn", true); 
             sessionStorage.setItem("UID", response.data.data); 
+            setLoading(false); 
             toast('🦄 Logged in Successfully. \n Redirecting to Profile page');
             setTimeout(() => {
-                navigate("/profile"); 
+                console.log(sessionStorage.getItem("TOKEN"), "local : ", localStorage.getItem("TOKEN"));
+                navigate("/profile", {UID : response.data.data}); 
             }, 5000)
         }
         catch(err){
@@ -37,8 +48,29 @@ function Login() {
         }
     }
 
+    const override = {
+        margin: "0 auto",
+        borderColor: "blue",
+        position: "absolute",
+        // width : "", 
+        top: "40%",
+        left : "45%",
+        marginLeft: "auto",
+        // display: "block",
+        // zIndex : "1000"
+      };
     return (
         <>
+         <div className='relative w-full h-full z-30'>
+            <MoonLoader
+            color={"#ffffff"}
+            loading={loading}
+            cssOverride={override}
+            size={60}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+            />
+         </div>
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
@@ -52,7 +84,7 @@ function Login() {
                 theme="dark"
             />
 
-            <section id='Login' className='px-8 mt-16'>
+            <section id='Login' className='px-8 mt-16 relative z-0'>
                 <div className='flex justify-center border-white border-2 flex-col items-center md:w-[40%] xs:w-[80%] xs:px-4 md:px-0 mx-auto py-8 rounded-lg'>
                     <h2 className='text-3xl font-semibold mb-8 text-center'>Login</h2>
                     <form action="" encType='multipart/form-data' className='md:w-[80%] sm:w-full' onSubmit={handleSubmit}>

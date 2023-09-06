@@ -25,11 +25,9 @@ function NFTs() {
       try {
         setLoading(true)
         let nfts = await APIService.fetchListedNfts();
-        // console.log(nfts);
 
         setNfts(nfts.data.data);
         setLoading(false);
-        // console.log(nftArray);
       }
       catch (err) {
         console.log(err);
@@ -131,20 +129,3 @@ function NFTs() {
 }
 
 export default NFTs
-
-
-//  {/* <div key={index}  className='card bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] mb-6'>
-//                 <p className='break-words'>Owner: {item.owner}</p>
-//                  <p className='break-words'>Owner : {item[0]}</p>
-//                 <p>name : {item.name}</p>
-//                 <p className='break-words'>Description : {item.description}</p>
-//                 <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
-//                 <div className='flex justify-between'>
-//                   <p>Item Id : {item.tokenId}</p>
-//                   <p>Price : {web3Utils.fromWei(item.price, "ether")} ETH</p>
-//                 </div>
-//                 <div className='flex justify-between items-center mt-3'>
-//                   <p>Category : {item.category}</p>
-//                   <button className='py-2 rounded-md btn-primary px-3' onClick={() => purchaseNFT(item.tokenId, item.price)}>Purchase</button>
-//                 </div>
-//               </div> */}

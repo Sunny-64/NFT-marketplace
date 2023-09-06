@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import ApiService from '../services/ApiServices';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import web3 from './../scripts/web3';
+import initWeb3 from './../scripts/web3';
 import { initContract } from "./../scripts/contract";
 
 import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
 import Countdown from '../components/Countdown';
+import axios from 'axios';
 
-function User() {
+function User(props) {
   const navigate = useNavigate();
   // console.log(sessionStorage.getItem("isLoggedIn"));
-  if (!localStorage.getItem("TOKEN") || !web3) {
+  if (!localStorage.getItem("TOKEN")) {
     navigate("/");
   }
   const [userData, setUserData] = useState();
@@ -24,42 +25,65 @@ function User() {
   const [auctionIndex, setAuctionIndex] = useState("");
   const [txs, setTxs] = useState([]);
   let [loading, setLoading] = useState(false);
-  const [txAmount, setTxAmount] = useState(); 
-  const [accounts, setAccounts] = useState([]); 
-
+  const [txAmount, setTxAmount] = useState();
+  const [accounts, setAccounts] = useState([]);
+  const [userId, setUserId] = useState("");
+  const [web3, setWeb3] = useState({}); 
   useEffect(() => {
+    // console.log("useEffect executed...");
+    setUserId(sessionStorage.getItem("UID"));
     const fetchData = async () => {
-      const fetchAccounts = await web3.eth.getAccounts();
-      const response = await ApiService.getUser(sessionStorage.getItem("UID"));
-      if (response.status !== 200) {
-        return toast.error(response.data.error);
-      }
-      setUserData(response.data.data);
+      try {
+        const fetchAccounts = await web3?.eth?.getAccounts();
+        // console.log(userId);
+        let url = `http://localhost:3000/users/${userId}`;
+        // console.log(localStorage.getItem("TOKEN"));
+        const response = await axios.get(url, {headers : {
+            'Accept' : "application/json",
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        }});
+        if (response.status !== 200) {
+          return toast.error(response.data.error);
+        }
+        setUserData(response.data.data);
 
-      if (!web3) {
-        return;
+        if (!web3) {
+          return;
+        }
+        setLoading(true);
+        const nfts = await ApiService.getUserNFTs(fetchAccounts[0]);
+        // console.log("user NFTss : ", nfts);
+        setUserNfts(nfts.data.data);
+        setLoading(false);
       }
-      setLoading(true);
-      const nfts = await ApiService.getUserNFTs(fetchAccounts[0]);
-      console.log("NFTss : ", nfts);
-      setUserNfts(nfts.data.data);
-      setLoading(false);
+      catch (err) {
+        console.log(err);
+      }
     }
     fetchData();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
+    // setup web3..
+    initWeb3()
+    .then(web3Instance => {
+      setWeb3(web3Instance); 
+      // console.log("initialized web3 in profile page...", web3);
+    })
+    .catch(err => {
+      console.log(err);
+    })
     initContract()
-      .then(async (contractInstance) => {
+      .then( (contractInstance) => {
         if (contractInstance) {
           // Contract initialized successfully
           console.log("Contract initialized.");
           setContract(contractInstance)
-          setAccounts(await web3.eth.getAccounts()); 
+          // setAccounts( web3.eth.getAccounts());
 
         } else {
           // Handle the case when the contract could not be initialized
-          console.log("Failed to initialize contract.");
+          console.log("Failed to initialize contract. ", contractInstance);
         }
       })
       .catch((err) => {
@@ -78,9 +102,9 @@ function User() {
       setLoading(true);
       const getMetaMaskAccounts = await web3.eth.getAccounts();
 
-      console.log("price : ", price, typeof price,);
-      console.log("Index : ", index, typeof index,);
-      console.log("acc : ", getMetaMaskAccounts[0],);
+      // console.log("price : ", price, typeof price,);
+      // console.log("Index : ", index, typeof index,);
+      // console.log("acc : ", getMetaMaskAccounts[0]);
 
       const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3.utils.toWei(price, "ether"), transactionType: "sell" });
       console.log(saveTx);
@@ -90,9 +114,9 @@ function User() {
       });
 
       setLoading(false);
-      toast.success("NFT listed for Sale"); 
-      console.log("NFT is Now Listed For Sale : ", listNft);
-      navigate("/"); 
+      toast.success("NFT listed for Sale");
+      // console.log("NFT is Now Listed For Sale : ", listNft);
+      navigate("/");
     }
     catch (err) {
       console.log(err);
@@ -110,19 +134,18 @@ function User() {
       setLoading(true);
       const fetchAccounts = await web3.eth.getAccounts();
       let auctionDurationInSeconds = Number(auctionDuration) * 3600;
-      if(auctionDuration < 1){
-        return window.alert("Please Enter hours greater than or equal to 1"); 
+      if (auctionDuration < 1) {
+        return window.alert("Please Enter hours greater than or equal to 1");
       }
       let auctionPriceInWei = web3.utils.toWei(auctionStartingPrice, 'ether');
-     
+
       setLoading(false);
-      setToggleAuctionForm(!toggleAuctionForm); 
+      setToggleAuctionForm(!toggleAuctionForm);
       const startAuction = await contract.methods.startAuction(auctionPriceInWei, auctionDurationInSeconds, auctionIndex).send({
         from: fetchAccounts[0]
       });
       toast.success("Transaction Successful");
       navigate("/");
-      // console.log(startAuction);
     }
     catch (err) {
       console.log(err);
@@ -140,7 +163,7 @@ function User() {
   };
 
   const handleFinalizeAuction = async (index, price) => {
-    try{
+    try {
       // console.log(index)
       const auctionDetails = await ApiService.getAuctionWithId(index);
       // console.log(auctionDetails);
@@ -155,41 +178,41 @@ function User() {
       }
       setLoading(true);
       const accounts = await web3.eth.getAccounts();
-  
+
       const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "sell" });
       // console.log(saveTx);
       let finalize = await contract.methods.finalizeAuction(index).send({
         from: accounts[0]
       });
-  
+
       // save transaction history..
       console.log("finalized : ", finalize);
       setLoading(false);
     }
-    catch(err){
+    catch (err) {
       console.log(err);
     }
   }
 
   const removeFromSale = async (tokenIndex) => {
     console.log(tokenIndex);
-     try{
-        let confirm = window.confirm("Are you sure you want to Remove it from sale"); 
-        if(!confirm){
-            return; 
-        }
-        toast("Removing from Sale please wait"); 
-        const remove = await contract.methods.removeFromSale(tokenIndex).send({
-            from : accounts[0], 
-        }); 
-        toast.success("NFT unlisted form sale successfully"); 
-        setTimeout(() => {
-          navigate("/profile")
-        }, 2000)
-     }
-     catch(err){
+    try {
+      let confirm = window.confirm("Are you sure you want to Remove it from sale");
+      if (!confirm) {
+        return;
+      }
+      toast("Removing from Sale please wait");
+      const remove = await contract.methods.removeFromSale(tokenIndex).send({
+        from: accounts[0],
+      });
+      toast.success("NFT unlisted form sale successfully");
+      setTimeout(() => {
+        navigate("/profile")
+      }, 2000)
+    }
+    catch (err) {
       console.log(err);
-     }
+    }
   }
 
 
@@ -206,11 +229,20 @@ function User() {
   useEffect(() => {
     // fetch user transactions...
     const fetchData = async () => {
-      setLoading(true);
-      const fetchTxs = await ApiService.getTxHistory();
-      setLoading(false);
-      console.log(fetchTxs.data.data);
-      setTxs(fetchTxs.data.data);
+      try {
+        setLoading(true);
+        let url = `http://localhost:3000/nfts/user/txs`; 
+        const fetchTxs = await axios.get(url, {headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+      }});
+        setLoading(false);
+        console.log(fetchTxs?.data?.data);
+        setTxs(fetchTxs?.data?.data);
+      }
+      catch (err) {
+        console.log(err);
+      }
     }
     fetchData();
   }, [])
@@ -272,14 +304,14 @@ function User() {
       }
 
       <div className='mt-8 grid lg:grid-cols-4 gap-3 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 px-4 '>
-        {userNfts?.map((item, index) => {
-          {/* console.log(item); */}
+        {userNfts?.length < 0 ? "you do not have any nfts.." :  userNfts?.map((item, index) => {
+          {/* console.log(item); */ }
           return (
             <div key={index} className='card col-span-1 bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6'>
               {/* <p className='break-words'>Owner: {item[0]}</p> */}
-              <p>name : {item.name}</p>
-              <p className='break-words'>Description : {item.description}</p>
-              <img src={item.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
+              <p>name : {item?.name}</p>
+              <p className='break-words'>Description : {item?.description}</p>
+              <img src={item?.tokenURI} className='w-full rounded-md my-3 h-[250px] object-cover' alt='' />
               <div className='flex justify-between'>
                 {/* <p>Item Id : {item.tokenId}</p> */}
                 {Boolean(item?.isListedForSale) && <p>Price : {Number(web3.utils.fromWei(item?.price, "ether"))} ETH</p>}
@@ -287,13 +319,13 @@ function User() {
                 <p>{Boolean(item?.isListedForAuction)}</p>
                 {/* {Boolean(item?.isListedForAuction) && <p>Highest Bid : {web3.utils.fromWei(item.highestBid, "ether")}</p>} */}
               </div>
-                {/* {item?.isListedForAuction && <p>You can Finalize Auction in : <br /><Countdown text="" endTime={item.endTime}/></p>}  */}
+              {/* {item?.isListedForAuction && <p>You can Finalize Auction in : <br /><Countdown text="" endTime={item.endTime}/></p>}  */}
               <div className='flex justify-between items-center mt-3'>
                 {/* <p>Sold : {item.isSold.toString()}</p> */}
-                {Boolean(item?.isListedForAuction) ? <button className={getRemainingTime(item?.endTime) > 0 ? 'py-2 rounded-md btn-primary px-3 disabled' : 'py-2 rounded-md btn-primary px-3'} disabled={getRemainingTime(item?.endTime) > 0} onClick={() => handleFinalizeAuction(item?.auctionIndex, item.price)}>{getRemainingTime(item.endTime) > 0 ? <Countdown text="Finalize in " endTime = {item.endTime}/> : "Finalize Auction"}</button> :
+                {Boolean(item?.isListedForAuction) ? <button className={getRemainingTime(item?.endTime) > 0 ? 'py-2 rounded-md btn-primary px-3 disabled' : 'py-2 rounded-md btn-primary px-3'} disabled={getRemainingTime(item?.endTime) > 0} onClick={() => handleFinalizeAuction(item?.auctionIndex, item.price)}>{getRemainingTime(item.endTime) > 0 ? <Countdown text="Finalize in " endTime={item.endTime} /> : "Finalize Auction"}</button> :
                   Boolean(!item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-3' onClick={() => handleAuction(item.tokenId)}>Auction</button>
                 }
-                  {/* {console.log()} */}
+                {/* {console.log()} */}
                 {Boolean(!item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-5' onClick={() => sellNft(item.tokenId)}>Sell</button>}
                 {Boolean(item?.isListedForSale) && Boolean(!item?.isListedForAuction) && <button className='py-2 rounded-md btn-primary px-5' onClick={() => removeFromSale(item.tokenId)}>Remove from Sell</button>}
               </div>
@@ -303,10 +335,10 @@ function User() {
       </div>
 
       <section id='tx' className='my-16 px-4'>
-      <h3 className='text-3xl font-semibold text-center mb-2'>Transactions</h3>
-      <hr className='mb-8' />
-      <div className='grid grid-cols-2 gap-4'>
-        {txs?.map((item, key) => {
+        <h3 className='text-3xl font-semibold text-center mb-2'>Transactions</h3>
+        <hr className='mb-8' />
+        <div className='grid grid-cols-2 gap-4'>
+          {txs?.map((item, key) => {
             return (
               <div key={key} className='gap-10 tx py-2 px-4 inline-flex rounded-lg col-span-1'>
                 <p>Token Id : {item.tokenId}</p>
@@ -316,7 +348,7 @@ function User() {
               </div>
             )
           })}
-      </div>
+        </div>
       </section>
     </>
   )

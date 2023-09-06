@@ -1,9 +1,12 @@
+import {React, useState, useEffect} from 'react';
 import Layout from './Layout';
 import User from './pages/User'; 
 
 import {
   createBrowserRouter,
+  Navigate,
   RouterProvider,
+  useNavigate
 } from 'react-router-dom';
 import Home from './pages/Home';
 import MintNFT from './pages/MintNFT';
@@ -12,7 +15,21 @@ import Login from './pages/Login';
 import Search from './pages/Search';
 import PageNotFound from './pages/PageNotFound';
 
-const router = createBrowserRouter([
+function ProtectedRoutes({component : Component, ...props}) {
+    const isLoggedIn = sessionStorage.getItem("isLoggedIn"); 
+    if(!isLoggedIn){
+        return <Navigate to={"/login"}/>
+    }
+    return <Component {...props}/>
+}
+
+function App() {
+  const [loggedIn, setLoggedIn] = useState(false); 
+  useEffect(() => {
+    setLoggedIn(Boolean(sessionStorage.getItem("isLoggedIn"))); 
+  }, [loggedIn]); 
+  console.log(loggedIn);
+  const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
@@ -34,17 +51,19 @@ const router = createBrowserRouter([
       }, 
       {
         path : "/profile",
-        element : sessionStorage.getItem("isLoggedIn") ? <User /> : <PageNotFound />
+        element : <ProtectedRoutes component={User}/>
       },
       {
         path : "/search",
         element : <Search />
+      }, 
+      {
+        path : "/page-not-found", 
+        element : <PageNotFound />
       }
     ],
   },
 ]);
-
-function App() {
   return (
     <div className="App">
         <RouterProvider router={router} />

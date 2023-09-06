@@ -9,6 +9,7 @@ function Header() {
     const confirm = window.confirm("Are you sure you want to logout")
     if(confirm){
       sessionStorage.clear(); 
+      localStorage.clear(); 
       navigate("/"); 
     }
   }
@@ -25,7 +26,7 @@ function Header() {
                 {sessionStorage.getItem("isLoggedIn")  ? 
                   <li><button className='btn-primary px-3 py-2 rounded-md flex items-center' onClick={logout}>Logout</button></li> 
                   : 
-                  <li><Link className='btn-primary px-3 py-2 rounded-md flex items-center' to={"/signup"}>Signup</Link></li> 
+                  <li><Link className='btn-primary px-3 py-2 rounded-md flex items-center' to={"/login"}>Login</Link></li> 
                 }
             </ul>
         </nav>
