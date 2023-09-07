@@ -29,12 +29,12 @@ function Signup() {
             }
 
             const response = await ApiService.register(user);
-            // console.log(response);
+            console.log(response);
             if (response.status !== 200) {
                 setLoading(false); 
                 // console.log("Registration failed"); 
-                setLoading(false); 
-                return toast(`Failed to Sign up ${response.data.error ?? response.data.message}`)
+                toast(`Failed to Sign up ${response.data.error ?? response.data.message}`)
+                return;
             }
             setLoading(false); 
             toast('🦄 Registered Successfully. \n Redirecting to Login page'); 

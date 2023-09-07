@@ -16,12 +16,22 @@ function NFT(props) {
     let [loading, setLoading] = useState(false);
     let [accounts, setAccounts] = useState([]); 
     const [web3, setWeb3] = useState({}); 
+    const [isOwner, setIsOwner] = useState(false); 
 
     useEffect(() => {
         // initialize web3.. 
+        // if(props.owner === accounts[0]){
+        //     setIsOwner(true); 
+        // }
         initWeb3()
         .then(web3Instance => {
             setWeb3(web3Instance); 
+            console.log("Web3 initialized and accounts fetched");
+            const fetchAccounts = async () => {
+                setAccounts(await web3Instance.eth.getAccounts()); 
+            }
+            fetchAccounts(); 
+            // console.log(accounts);
         })
         .catch(err => {
             console.log(err);
@@ -32,8 +42,8 @@ function NFT(props) {
           if (contractInstance) {
             // Contract initialized successfully
             setContract(contractInstance); 
-            setAccounts(await web3.eth.getAccounts()); 
-            console.log("Contract initialized and accounts fetched");
+            // setAccounts(await web3.eth.getAccounts()); 
+            console.log("Contract initialized");
   
           } else {
             // Handle the case when the contract could not be initialized
@@ -47,24 +57,26 @@ function NFT(props) {
 
     const purchaseNFT = async (index, price, owner) => {
         if (!sessionStorage.getItem("isLoggedIn")) {
-            return toast.error("You have to login to purchase the NFT");
+            toast.error("You have to login to purchase the NFT");
+            return; 
         }
         try {
             const accounts = await web3.eth.getAccounts();
             setLoading(true);
-
-           
+            
             const purchase = await contract.methods.purchaseNFT(index).send({
                 from: accounts[0],
-                value: price
+                value: price, 
+                gas : "500000"
             });
             
             console.log(purchase);
-            const saveTx = await APIService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "purchase" });
+            const saveTx = await APIService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "purchase", transactionHash : purchase?.transactionHash  ?? ""});
             console.log(saveTx);
             setLoading(false);
 
             console.log("tx", purchase);
+            window.location.reload();
         }
         catch (err) {
             console.log(err);
@@ -81,6 +93,7 @@ function NFT(props) {
         display: "block",
       };
 
+      console.log(isOwner);
 
     return (
         <>
@@ -96,6 +109,7 @@ function NFT(props) {
                 </div>
                 <div className='flex justify-between items-center mt-3'>
                     <p><span className='opacity-80'>Category :</span> <span className='font-semibold'>{props.category}</span></p>
+                    {/* {console.log(props.owner, "accounts : ", accounts[0])} */}
                     {props.owner !== accounts[0] && <button className='py-2 rounded-md btn-primary px-3' onClick={() => purchaseNFT(props.tokenId, props.price, props.owner)}>Purchase</button>}
                 </div>
             </div>

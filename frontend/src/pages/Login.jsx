@@ -29,9 +29,10 @@ function Login() {
             sessionStorage.clear(); 
             localStorage.clear(); 
             const response = await ApiService.login(formData);
-            if (response.status !== 200) {
+            if (response.status === 500) {
                 setLoading(false); 
-                return toast.error("Failed to Login ", response.data.error); 
+                toast.error("Failed to Login ", response.data.error); 
+                return;
             }
             localStorage.setItem("TOKEN", response.data.token);
             sessionStorage.setItem("TOKEN", response.data.token); 
@@ -40,11 +41,12 @@ function Login() {
             setLoading(false); 
             toast('🦄 Logged in Successfully. \n Redirecting to Profile page');
             setTimeout(() => {
-                console.log(sessionStorage.getItem("TOKEN"), "local : ", localStorage.getItem("TOKEN"));
+                // console.log(sessionStorage.getItem("TOKEN"), "local : ", localStorage.getItem("TOKEN"));
                 navigate("/profile", {UID : response.data.data}); 
             }, 5000)
         }
         catch (err) {
+            toast.error(err);
             console.log(err);
         }
     }

@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import initWeb3 from './../scripts/web3';
 import { initContract } from "./../scripts/contract";
+import web3Utils from '../scripts/web3Utils';
 
 import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
@@ -112,18 +113,28 @@ function User(props) {
       setLoading(true);
       const getMetaMaskAccounts = await web3.eth.getAccounts();
 
-      const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3.utils.toWei(price, "ether"), transactionType: "sell" });
-      console.log(saveTx);
+      
+      contract.methods.sellNFT(index, web3.utils.toWei(Number(price), "ether")).send({
+        from: getMetaMaskAccounts[0], 
+        gas : "500000"
+      })
+      .then(listNft => {
+          const saveTxInDB = async () => {
+            const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3.utils.toWei(price, "ether"), transactionType: "sell", transactionHash : listNft.transactionHash ?? ""});
+            console.log(saveTx);
+          }
 
-      const listNft = await contract.methods.sellNFT(index, web3.utils.toWei(Number(price), "ether")).send({
-        from: getMetaMaskAccounts[0]
-      });
-
-      setLoading(false);
-      toast.success("NFT listed for Sale");
-      navigate("/");
+          saveTxInDB(); 
+          setLoading(false);
+          toast.success("NFT listed for Sale");
+          navigate("/");
+      })
+      .catch(err => {
+        console.log(err);
+      }); 
     }
     catch (err) {
+      toast.error(err.message);
       console.log(err);
     }
   }
@@ -147,7 +158,8 @@ function User(props) {
       setLoading(false);
       setToggleAuctionForm(!toggleAuctionForm);
       const startAuction = await contract.methods.startAuction(auctionPriceInWei, auctionDurationInSeconds, auctionIndex).send({
-        from: fetchAccounts[0]
+        from: fetchAccounts[0], 
+        gas : "500000"
       });
       toast.success("Transaction Successful");
       navigate("/");
@@ -184,12 +196,11 @@ function User(props) {
       setLoading(true);
       const accounts = await web3.eth.getAccounts();
 
-      const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "sell" });
       // console.log(saveTx);
       let finalize = await contract.methods.finalizeAuction(index).send({
         from: accounts[0]
       });
-
+      const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "sell", transactionHash : finalize?.transactionHash ?? "" });
       // save transaction history..
       console.log("finalized : ", finalize);
       setLoading(false);
@@ -309,7 +320,7 @@ function User(props) {
       }
 
       <div className='mt-8 grid lg:grid-cols-4 gap-3 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 px-4 '>
-        {userNfts?.length < 0 ? "you do not have any nfts.." :  userNfts?.map((item, index) => {
+        {userNfts?.length < 1 ? "you do not have any nfts.." :  userNfts?.map((item, index) => {
           return (
             <div key={index} className='card col-span-1 bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6'>
               {/* <p className='break-words'>Owner: {item[0]}</p> */}
@@ -347,7 +358,7 @@ function User(props) {
               <div key={key} className='gap-10 tx py-2 px-4 inline-flex rounded-lg col-span-1'>
                 <p>Token Id : {item?.tokenId}</p>
                 {/* {setTxAmount(item?.transactionAmount ?? "xx")} */}
-                {/* <p>Transaction Amount : {web3.utils.fromWei(item.transactionAmount, "ether")} ETH</p> */}
+                <p>Transaction Amount : {web3Utils.fromWei(item.transactionAmount, "ether")} ETH</p>
                 <p>Transaction Type : {item?.transactionType}</p>
               </div>
             )

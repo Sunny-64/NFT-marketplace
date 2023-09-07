@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import storage from './../scripts/firebase'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { v4 as uuidv4 } from 'uuid';
-import web3 from './../scripts/web3'
+import initWeb3 from './../scripts/web3'
 import { initContract } from "./../scripts/contract";
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
@@ -25,6 +25,8 @@ function MintNFT() {
     // const [imageDownloadUrl, setImageDownloadUrl] = useState(""); 
     const [contract, setContract] = useState("");
     let [loading, setLoading] = useState(false);
+    const [web3, setWeb3] = useState({}); 
+    const [accounts, setAccounts] = useState([]); 
 
 
     let imageName;
@@ -57,7 +59,7 @@ function MintNFT() {
 
             const imageDownloadUrl = await getDownloadURL(ref(storage, `images/${imageName}/`));
             setLoading(false);
-            toast.success("NFT created... Confirming transaction");
+            toast.success("Confirming Transactin...");
 
             // get accounts  
             const accounts = await web3.eth.getAccounts();
@@ -110,6 +112,21 @@ function MintNFT() {
     }
 
     useEffect(() => {
+        // Initialize web3...
+        initWeb3()
+        .then(web3Instance => {
+            console.log(web3Instance); 
+            setWeb3(web3Instance); 
+            const fetchAccounts = async () => {
+                setAccounts(await web3Instance.eth.getAccounts()); 
+            }
+            fetchAccounts();
+        })
+        .catch(err => {
+            console.log(err); 
+        }); 
+        
+        // initialize contract
         initContract()
             .then((contractInstance) => {
                 if (contractInstance) {
