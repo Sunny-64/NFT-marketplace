@@ -8,6 +8,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
 
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import APIService from '../services/ApiServices';
 import { initContract } from '../scripts/contract';
 
@@ -17,12 +19,10 @@ function NFT(props) {
     let [accounts, setAccounts] = useState([]); 
     const [web3, setWeb3] = useState({}); 
     const [isOwner, setIsOwner] = useState(false); 
+    const navigate = useLocation(); 
+    // const [txStatus, setTxStatus] = useState(); // to show transaction status..
 
     useEffect(() => {
-        // initialize web3.. 
-        // if(props.owner === accounts[0]){
-        //     setIsOwner(true); 
-        // }
         initWeb3()
         .then(web3Instance => {
             setWeb3(web3Instance); 
@@ -56,13 +56,13 @@ function NFT(props) {
     }, [])
 
     const purchaseNFT = async (index, price, owner) => {
+        setLoading(true);
         if (!sessionStorage.getItem("isLoggedIn")) {
             toast.error("You have to login to purchase the NFT");
             return; 
         }
         try {
             const accounts = await web3.eth.getAccounts();
-            setLoading(true);
             
             const purchase = await contract.methods.purchaseNFT(index).send({
                 from: accounts[0],
@@ -76,10 +76,11 @@ function NFT(props) {
             setLoading(false);
 
             console.log("tx", purchase);
-            window.location.reload();
+            navigate("/profile");
         }
         catch (err) {
             console.log(err);
+            setLoading(false);
         }
     }
 

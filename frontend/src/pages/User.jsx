@@ -72,6 +72,7 @@ function User(props) {
           const nfts = await ApiService.getUserNFTs(fetchAccounts[0]);
           // console.log(fetchAccounts);
           setUserNfts(nfts.data.data);
+          console.log("Users NFTs.. ", nfts.data.data);
           setLoading(false);
         }
         catch(err){
@@ -83,7 +84,6 @@ function User(props) {
     .catch(err => {
       console.log(err);
     })
-    
     initContract()
       .then( (contractInstance) => {
         if (contractInstance) {
@@ -107,13 +107,11 @@ function User(props) {
     if (!confirm) {
       return;
     }
-
     const price = prompt("Enter the Price for the NFT");
     try {
       setLoading(true);
       const getMetaMaskAccounts = await web3.eth.getAccounts();
 
-      
       contract.methods.sellNFT(index, web3.utils.toWei(Number(price), "ether")).send({
         from: getMetaMaskAccounts[0], 
         gas : "500000"
@@ -123,11 +121,11 @@ function User(props) {
             const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3.utils.toWei(price, "ether"), transactionType: "sell", transactionHash : listNft.transactionHash ?? ""});
             console.log(saveTx);
           }
-
           saveTxInDB(); 
           setLoading(false);
-          toast.success("NFT listed for Sale");
           navigate("/");
+          toast.success("NFT listed for Sale");
+          return;
       })
       .catch(err => {
         console.log(err);
@@ -157,12 +155,19 @@ function User(props) {
 
       setLoading(false);
       setToggleAuctionForm(!toggleAuctionForm);
-      const startAuction = await contract.methods.startAuction(auctionPriceInWei, auctionDurationInSeconds, auctionIndex).send({
+      contract.methods.startAuction(auctionPriceInWei, auctionDurationInSeconds, auctionIndex).send({
         from: fetchAccounts[0], 
         gas : "500000"
+      })
+      .then(auctionData => {
+        navigate("/");
+        toast.success("Transaction Successful");
+      })
+      .catch(err => {
+        console.log(err);
+        toast.error("Transaction Failed");
       });
-      toast.success("Transaction Successful");
-      navigate("/");
+      
     }
     catch (err) {
       console.log(err);
@@ -198,12 +203,15 @@ function User(props) {
 
       // console.log(saveTx);
       let finalize = await contract.methods.finalizeAuction(index).send({
-        from: accounts[0]
+        from: accounts[0], 
+        gas : "500000"
       });
+      console.log({ tokenId: index, transactionAmount: price, transactionType: "sell", transactionHash : finalize?.transactionHash})
       const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "sell", transactionHash : finalize?.transactionHash ?? "" });
       // save transaction history..
       console.log("finalized : ", finalize);
       setLoading(false);
+      window.location.reload();
     }
     catch (err) {
       console.log(err);
@@ -224,13 +232,13 @@ function User(props) {
       toast.success("NFT unlisted form sale successfully");
       setTimeout(() => {
         navigate("/profile")
+        toast.success("NFT Removed From Sale"); 
       }, 2000)
     }
     catch (err) {
       console.log(err);
     }
   }
-
 
   const override = {
     margin: "0 auto",
@@ -253,7 +261,7 @@ function User(props) {
           Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
       }});
         setLoading(false);
-        console.log(fetchTxs?.data?.data);
+        console.log("txs : ", fetchTxs?.data?.data);
         setTxs(fetchTxs?.data?.data);
       }
       catch (err) {
@@ -358,7 +366,7 @@ function User(props) {
               <div key={key} className='gap-10 tx py-2 px-4 inline-flex rounded-lg col-span-1'>
                 <p>Token Id : {item?.tokenId}</p>
                 {/* {setTxAmount(item?.transactionAmount ?? "xx")} */}
-                <p>Transaction Amount : {web3Utils.fromWei(item.transactionAmount, "ether")} ETH</p>
+                {/* <p>Transaction Amount : {web3Utils.fromWei(item?.transactionAmount, "ether") ?? "xxx"} ETH</p> */}
                 <p>Transaction Type : {item?.transactionType}</p>
               </div>
             )
