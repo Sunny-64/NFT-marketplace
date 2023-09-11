@@ -1,4 +1,4 @@
-import {React, useState, useEffect} from 'react'
+import { React, useState, useEffect } from 'react'
 import web3Utils from '../scripts/web3Utils'
 import initWeb3 from '../scripts/web3';
 
@@ -16,67 +16,80 @@ import { initContract } from '../scripts/contract';
 function NFT(props) {
     const [contract, setContract] = useState("");
     let [loading, setLoading] = useState(false);
-    let [accounts, setAccounts] = useState([]); 
-    const [web3, setWeb3] = useState({}); 
-    const [isOwner, setIsOwner] = useState(false); 
-    const navigate = useLocation(); 
+    let [accounts, setAccounts] = useState([]);
+    const [web3, setWeb3] = useState({});
+    const [isOwner, setIsOwner] = useState(false);
+    const navigate = useLocation();
     // const [txStatus, setTxStatus] = useState(); // to show transaction status..
 
     useEffect(() => {
         initWeb3()
-        .then(web3Instance => {
-            setWeb3(web3Instance); 
-            console.log("Web3 initialized and accounts fetched");
-            const fetchAccounts = async () => {
-                setAccounts(await web3Instance.eth.getAccounts()); 
-            }
-            fetchAccounts(); 
-            // console.log(accounts);
-        })
-        .catch(err => {
-            console.log(err);
-        }); 
-        
+            .then(web3Instance => {
+                setWeb3(web3Instance);
+                console.log("Web3 initialized and accounts fetched");
+                const fetchAccounts = async () => {
+                    setAccounts(await web3Instance.eth.getAccounts());
+                }
+                fetchAccounts();
+                // console.log(accounts);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
         initContract()
-        .then(async (contractInstance) => {
-          if (contractInstance) {
-            // Contract initialized successfully
-            setContract(contractInstance); 
-            // setAccounts(await web3.eth.getAccounts()); 
-            console.log("Contract initialized");
-  
-          } else {
-            // Handle the case when the contract could not be initialized
-            console.log("Failed to initialize contract.");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+            .then(async (contractInstance) => {
+                if (contractInstance) {
+                    // Contract initialized successfully
+                    setContract(contractInstance);
+                    // setAccounts(await web3.eth.getAccounts()); 
+                    console.log("Contract initialized");
+
+                } else {
+                    // Handle the case when the contract could not be initialized
+                    console.log("Failed to initialize contract.");
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }, [])
 
     const purchaseNFT = async (index, price, owner) => {
         setLoading(true);
         if (!sessionStorage.getItem("isLoggedIn")) {
             toast.error("You have to login to purchase the NFT");
-            return; 
+            return;
         }
         try {
             const accounts = await web3.eth.getAccounts();
-            
-            const purchase = await contract.methods.purchaseNFT(index).send({
-                from: accounts[0],
-                value: price, 
-                gas : "500000"
-            });
-            
-            console.log(purchase);
-            const saveTx = await APIService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "purchase", transactionHash : purchase?.transactionHash  ?? ""});
-            console.log(saveTx);
-            setLoading(false);
 
-            console.log("tx", purchase);
-            navigate("/profile");
+            contract.methods.purchaseNFT(index).send({
+                from: accounts[0],
+                value: price,
+                gas: "500000"
+            })
+            .then(purchase => {
+                APIService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "purchase", transactionHash: purchase?.transactionHash ?? "" })
+                .then(saveTx => {
+                    console.log(saveTx);
+                    setLoading(false);
+
+                    console.log("tx", purchase);
+                    navigate("/profile");
+                    toast.success("transaction Complete")
+                })
+                .catch(err => {
+                    console.log(err);
+                    toast.error("Error while Saving the tx : ", err.message)
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                toast.error(err.message);
+            });
+
+
         }
         catch (err) {
             console.log(err);
@@ -89,12 +102,12 @@ function NFT(props) {
         borderColor: "blue",
         position: "absolute",
         top: "40%",
-        left : "45%",
+        left: "45%",
         marginLeft: "auto",
         display: "block",
-      };
+    };
 
-      console.log(isOwner);
+    console.log(isOwner);
 
     return (
         <>

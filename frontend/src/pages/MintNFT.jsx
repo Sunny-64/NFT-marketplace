@@ -87,20 +87,20 @@ function MintNFT() {
 
                     console.log("Data to be sent to the server : ", data);
                     ApiService.addNFT(data)
-                        .then(saveNFTData => {
-                            if (saveNFTData.status === 200) {
-                                console.log("NFT SAVED...");
-                            }
-                            else {
-                                console.log("NFT not saved")
+                    .then(saveNFTData => {
+                        if (saveNFTData.status === 200) {
+                            console.log("NFT SAVED...");
+                        }
+                        else {
+                            console.log("NFT not saved")
 
-                            }
-                            console.log('result : ', executeMint);
-                            navigate("/profile"); 
-                        })
-                        .catch(err => {
-                            console.log(err);
-                        });
+                        }
+                        console.log('result : ', executeMint);
+                        navigate("/profile"); 
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
                 })
                 .catch(err => {
                     console.log(err);

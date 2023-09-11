@@ -102,7 +102,7 @@ function AuctionNFTs() {
 
 
             {
-                auctions.length > 0 &&
+                auctions?.length > 0 &&
                 <>
                     <div className='flex justify-between'>
                         {auctions?.length > 0 ? <h3 className='font-semibold text-3xl mb-4'>Auction NFTs</h3> : <p className='mt-5'>No NFT's has been listed for Auction yet</p>}

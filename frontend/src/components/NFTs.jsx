@@ -27,6 +27,7 @@ function NFTs() {
         let nfts = await APIService.fetchListedNfts();
 
         setNfts(nfts.data.data);
+        // console.log("user nfts",nfts.data);
         setLoading(false);
       }
       catch (err) {

@@ -102,19 +102,29 @@ function AuctionNFT(props) {
                 window.alert("Please login to meta mask first");
                 return;
             }
+            
             // initiate bidding...
             console.log("Bidding...")
-            // console.log(contract)
-            const bid = await contract.methods.bidOnAuction(index).send({
+            contract.methods.bidOnAuction(index).send({
                 from: accounts[0],
                 value: web3.utils.toWei(biddingAmount, "ether"), 
                 gas : "500000"
+            })
+            .then(bid => {
+                console.log("Bid : ", bid);
+                const saveTx = async () => {
+                    const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3?.utils?.toWei(biddingAmount, "ether"), transactionType: "bid" });
+                    console.log(saveTx);
+                    setLoading(false);
+                }
+                saveTx();
+                toast.success("Bid successfully");
+                setTimeout(() => window.location.reload(), 2000);
+            })
+            .catch(err => {
+                toast.error(err.message);
+                console.log(err);
             });
-            const saveTx = await ApiService.saveTx({ tokenId: index, transactionAmount: web3?.utils?.toWei(biddingAmount, "ether"), transactionType: "bid" });
-            console.log(saveTx);
-            setLoading(false);
-            console.log("success : ", bid);
-            window.location.reload();
         }
         catch (err) {
             console.log(err);
