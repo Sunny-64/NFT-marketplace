@@ -123,9 +123,7 @@ function UserNFT(props) {
         console.log(remove);
         setLoading(false);
         toast.success("NFT unlisted form sale successfully");
-        setTimeout(() => {
-          navigate("/profile")
-        }, 2000);
+        window.location.reload();
       })
       .catch(err => {
         setLoading(false);

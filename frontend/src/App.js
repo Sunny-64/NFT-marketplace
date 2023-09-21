@@ -14,9 +14,6 @@ import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Search from './pages/Search';
 import PageNotFound from './pages/PageNotFound';
-import axios from 'axios';
-import { BASE_URL } from './services/ApiServices';
-import Ngrok from './components/Ngrok';
 
 function ProtectedRoutes({component : Component, ...props}) {
     const isLoggedIn = sessionStorage.getItem("isLoggedIn"); 
@@ -27,28 +24,6 @@ function ProtectedRoutes({component : Component, ...props}) {
 }
 
 function App() {
-
-   // make a api initial api request so that initially we can render ngrok page..
-  /* 
-    but i need to render it only once...
-  */
-//  const [isRendered, setIsRendered] = useState(false); 
-//  const [ngrokPage, setNgrokPage] = useState(""); 
-//  useEffect(() => {
-//     // allow ngrok initial render 
-//     if(isRendered){
-//         return;
-//     }
-//     axios.get(`${BASE_URL}/`)
-//     .then(res => {
-//         console.log("app.js -> ",res.data);
-//         setNgrokPage(res.data)
-//     })
-//     .catch(err => {
-//       console.log(err);
-//     })
-//  }, [])
-
 
   const [loggedIn, setLoggedIn] = useState(false); 
 
@@ -91,12 +66,7 @@ function App() {
     ],
   },
 ]);
-  // return isRendered ? 
-  //   <div className="App">
-  //         <RouterProvider router={router} />
-  //   </div> 
-  //   : 
-    // <Ngrok pageHTml = {ngrokPage}/>
+
     return (
       <div className="App">
         <RouterProvider router={router} />

@@ -20,7 +20,8 @@ function Search() {
   const [name, setName] = useState("");
   let [loading, setLoading] = useState(false);
   const [web3, setWeb3] = useState({});
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+
   useEffect(() => {
     initWeb3()
       .then(web3Instance => {
@@ -47,12 +48,17 @@ function Search() {
       });
 
     const fetchData = async () => {
-      // fetch categories
-      setLoading(true);
-      const fetchCategories = await ApiService.getCategories();
-      // console.log(fetchCategories.data.data);
-      setCategories(fetchCategories.data.data);
-      setLoading(false);
+      try {
+        // fetch categories
+        setLoading(true);
+        const fetchCategories = await ApiService.getCategories();
+        // console.log(fetchCategories.data.data);
+        setCategories(fetchCategories.data.data);
+        setLoading(false);
+      }
+      catch (err) {
+        console.log(err);
+      }
     }
 
     fetchData();
@@ -61,11 +67,16 @@ function Search() {
   // console.log(categories);
 
   const filterByCategory = async (category) => {
-    setLoading(true);
-    const data = await ApiService.searchByCategory(category);
-    console.log(data);
-    setNfts(data.data.data);
-    setLoading(false)
+    try {
+      setLoading(true);
+      const data = await ApiService.searchByCategory(category);
+      console.log(data);
+      setNfts(data.data.data);
+      setLoading(false)
+    }
+    catch (err) {
+      console.log(err);
+    }
   }
 
   const purchaseNFT = async (index, price) => {
@@ -108,14 +119,19 @@ function Search() {
 
   const handleSearchNFt = async (e) => {
     e.preventDefault();
-    if (name.trim() === "") {
-      return;
+    try{
+      if (name.trim() === "") {
+        return;
+      }
+      setLoading(true);
+      const data = await ApiService.searchByName(name);
+      // console.log(data);
+      setNfts(data.data.data);
+      setLoading(false);
     }
-    setLoading(true);
-    const data = await ApiService.searchByName(name);
-    // console.log(data);
-    setNfts(data.data.data);
-    setLoading(false);
+    catch(err){
+      console.log(err);
+    }
   }
   const override = {
     margin: "0 auto",
@@ -203,7 +219,7 @@ function Search() {
                   </div>
                   <div className='flex justify-between items-center mt-3'>
                     <p>Category : {item.category}</p>
-                    {item.price > 0 && <button className='py-2 rounded-md btn-primary px-3' onClick={() => navigate("/")}>Auction</button>}
+                    {item.price > 0 && <button className='py-2 rounded-md btn-primary px-3' onClick={() => navigate("/")}>Bid</button>}
                   </div>
                 </div>
               }

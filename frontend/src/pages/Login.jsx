@@ -47,6 +47,7 @@ function Login() {
         }
         catch (err) {
             toast.error(err);
+            alert("Wrong email or password");
             console.log(err);
         }
     }

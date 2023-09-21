@@ -19,7 +19,7 @@ function NFT(props) {
     let [accounts, setAccounts] = useState([]);
     const [web3, setWeb3] = useState({});
     const [isOwner, setIsOwner] = useState(false);
-    const navigate = useLocation();
+    const navigate = useNavigate();
     // const [txStatus, setTxStatus] = useState(); // to show transaction status..
 
     useEffect(() => {
@@ -70,6 +70,7 @@ function NFT(props) {
                 gas: "500000"
             })
             .then(purchase => {
+                console.log(purchase);
                 APIService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "purchase", transactionHash: purchase?.transactionHash ?? "" })
                 .then(saveTx => {
                     console.log(saveTx);

@@ -23,29 +23,36 @@ function MintNFT() {
     const [category, setCategory] = useState("");
     const [image, setImage] = useState();
     // const [imageDownloadUrl, setImageDownloadUrl] = useState(""); 
-    const [contract, setContract] = useState("");
+    const [contract, setContract] = useState();
     let [loading, setLoading] = useState(false);
-    const [web3, setWeb3] = useState({}); 
-    const [accounts, setAccounts] = useState([]); 
+    const [web3, setWeb3] = useState(); 
+    const [accounts, setAccounts] = useState(); 
 
 
     let imageName;
 
     const handleSubmit = async (e) => {
-        if (!sessionStorage.getItem("isLoggedIn")) {
-            toast.error("please login first");
-            return;
-        }
-        if(!web3){
-            alert("Please install metaMask first"); 
-            return;
-        }
         e.preventDefault();
         try {
+            const ethAccounts = await web3.eth.getAccounts();
+            if (!sessionStorage.getItem("isLoggedIn")) {
+                toast.error("please login first");
+                return;
+            }
+            if(!web3){
+                alert("Please install metaMask first"); 
+                return;
+            }
+            e.preventDefault();
             // Upload image to firebase and get the image url...
-            if(!contract || !web3){
+            if(!contract){
                 toast.error("Please login into metamask first"); 
                 return; 
+            }
+
+            if(!ethAccounts){
+                toast.error("Please Login into metamask");
+                return
             }
             if (!image) {
                 return;
@@ -62,14 +69,14 @@ function MintNFT() {
             toast.success("Confirming Transactin...");
 
             // get accounts  
-            const accounts = await web3.eth.getAccounts();
+            
             console.log(contract);
             setLoading(true);
 
             // make request to blockchain for minting the NFT.
             contract.methods.mintNFT(imageDownloadUrl, name, description, category)
                 .send({
-                    from: accounts[0],
+                    from: ethAccounts[0],
                 })
                 .then(executeMint => {
                     console.log(executeMint);
@@ -81,7 +88,7 @@ function MintNFT() {
                         tokenName: name,
                         tokenURI: imageDownloadUrl,
                         tokenDescription: description,
-                        ownerAddress: accounts[0],
+                        ownerAddress: ethAccounts[0],
                         category: category
                     }
 
@@ -118,7 +125,15 @@ function MintNFT() {
             console.log(web3Instance); 
             setWeb3(web3Instance); 
             const fetchAccounts = async () => {
-                setAccounts(await web3Instance.eth.getAccounts()); 
+                try{
+                    if(web3Instance){
+                        setAccounts(await web3Instance?.eth?.getAccounts()); 
+                    }
+                   
+                }
+                catch(err){
+                    console.log(err);
+                }
             }
             fetchAccounts();
         })

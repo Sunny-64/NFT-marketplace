@@ -1,6 +1,7 @@
 import {React, useEffect, useState} from 'react'
 import axios from 'axios';
 import { BASE_URL } from '../../services/ApiServices';
+import web3Utils from '../../scripts/web3Utils';
 
 function UserTx() {
     let [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ function UserTx() {
               <div key={key} className='gap-10 tx py-2 px-4 inline-flex rounded-lg col-span-1'>
                 <p>Token Id : {item?.tokenId}</p>
                 {/* {setTxAmount(item?.transactionAmount ?? "xx")} */}
-                {/* <p>Transaction Amount : {web3Utils.fromWei(item?.transactionAmount, "ether") ?? "xxx"} ETH</p> */}
+                <p>Transaction Amount : {web3Utils.fromWei(item?.transactionAmount, "ether")} ETH</p>
                 <p>Transaction Type : {item?.transactionType}</p>
               </div>
             )

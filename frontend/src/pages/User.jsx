@@ -1,14 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import ApiService from '../services/ApiServices';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import initWeb3 from './../scripts/web3';
 import { initContract } from "./../scripts/contract";
-import web3Utils from '../scripts/web3Utils';
 
-import { CSSProperties } from "react";
 import MoonLoader from "react-spinners/MoonLoader";
-import Countdown from '../components/Countdown';
 import axios from 'axios';
 import UserNFTs from '../components/user/UserNFTs';
 import UserTx from '../components/user/UserTx';
@@ -135,14 +131,13 @@ function User(props) {
         <p className='bg-[#000] px-3 py-2 inline-block rounded-md'>{userData?.mobile}</p>
       </section>
       
-      {!web3 && !contract && !accounts ? "Loading..." :  
+      {!web3 && !contract && !accounts ? <p className='px-4'> Please install and login into metamask</p> :  
           <UserNFTs 
             contract = {contract}
             web3 = {web3}
             accounts = {accounts}
           />
       }
-
       <UserTx />
     </>
   )
