@@ -31,6 +31,7 @@ function UserNFTs(props) {
       <div className='mt-8 grid lg:grid-cols-4 gap-3 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 px-4 '>
         {!props.web3 && !props.accounts ? "Fetching Data...." :
           userNfts?.length < 1 ? "you do not have any nfts.." : userNfts?.map((item, index) => {
+            console.log(item);
             return (
               <UserNFT
                 key={index}
@@ -46,6 +47,7 @@ function UserNFTs(props) {
                 contract={props.contract}
                 web3={props.web3}
                 accounts={props.accounts}
+                auctionIndex = {item.auctionIndex}
               />
             )
           })
