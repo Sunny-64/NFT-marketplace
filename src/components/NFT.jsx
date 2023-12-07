@@ -28,7 +28,12 @@ function NFT(props) {
                 setWeb3(web3Instance);
                 console.log("Web3 initialized and accounts fetched");
                 const fetchAccounts = async () => {
-                    setAccounts(await web3Instance.eth.getAccounts());
+                    try {
+                        setAccounts(await web3Instance.eth.getAccounts());
+                    }
+                    catch (err) {
+                        console.log(err);
+                    }
                 }
                 fetchAccounts();
                 // console.log(accounts);
@@ -69,26 +74,26 @@ function NFT(props) {
                 value: price,
                 gas: "500000"
             })
-            .then(purchase => {
-                console.log(purchase);
-                APIService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "purchase", transactionHash: purchase?.transactionHash ?? "" })
-                .then(saveTx => {
-                    console.log(saveTx);
-                    setLoading(false);
+                .then(purchase => {
+                    console.log(purchase);
+                    APIService.saveTx({ tokenId: index, transactionAmount: price, transactionType: "purchase", transactionHash: purchase?.transactionHash ?? "" })
+                        .then(saveTx => {
+                            console.log(saveTx);
+                            setLoading(false);
 
-                    console.log("tx", purchase);
-                    navigate("/profile");
-                    toast.success("transaction Complete")
+                            console.log("tx", purchase);
+                            navigate("/profile");
+                            toast.success("transaction Complete")
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            toast.error("Error while Saving the tx : ", err.message)
+                        });
                 })
                 .catch(err => {
                     console.log(err);
-                    toast.error("Error while Saving the tx : ", err.message)
+                    toast.error(err.message);
                 });
-            })
-            .catch(err => {
-                console.log(err);
-                toast.error(err.message);
-            });
 
 
         }
