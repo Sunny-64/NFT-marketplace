@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { CSSProperties } from "react";
-import MoonLoader from "react-spinners/MoonLoader";
+import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 
 function Login() {
     const navigate = useNavigate();
@@ -41,35 +41,36 @@ function Login() {
             setLoading(false); 
             toast('🦄 Logged in Successfully. \n Redirecting to Profile page');
             setTimeout(() => {
-                // console.log(sessionStorage.getItem("TOKEN"), "local : ", localStorage.getItem("TOKEN"));
                 navigate("/profile", {UID : response.data.data}); 
             }, 5000)
         }
         catch (err) {
-            toast.error(err);
-            alert("Wrong email or password");
+            setLoading(false); 
+            toast.error("Invalid credentials");
             console.log(err);
         }
     }
     const override = {
-        margin: "0 auto",
-        borderColor: "blue",
-        position: "absolute",
-        // width : "", 
-        top: "40%",
-        left : "45%",
-        marginLeft: "auto",
-        // display: "block",
-        // zIndex : "1000"
+        width: '100%',
+        margin: '0 auto',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)', // Center the loader
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 50,
+
       };
     return (
         <>
-         <div className='relative w-full h-full z-30'>
-            <MoonLoader
-            color={"#ffffff"}
+         <div className='w-full h-full'>
+            <ClimbingBoxLoader
+            color={"#79279F"}
             loading={loading}
             cssOverride={override}
-            size={60}
+            size={20}
             aria-label="Loading Spinner"
             data-testid="loader"
             />
@@ -87,10 +88,10 @@ function Login() {
                 theme="dark"
             />
 
-            <section id='Login' className='px-8 mt-16 relative z-0'>
-                <div className='flex justify-center border-white border-2 flex-col items-center md:w-[40%] xs:w-[80%] xs:px-4 md:px-0 mx-auto py-8 rounded-lg'>
+            <section id='Login' className={`px-8 mt-16 ${loading && 'opacity-40'}`}>
+                <div className='flex justify-center border-white border-2 flex-col items-center md:w-[40%] w-[80%] px-4 md:px-0 mx-auto py-8 rounded-lg'>
                     <h2 className='text-3xl font-semibold mb-8 text-center'>Login</h2>
-                    <form action="" encType='multipart/form-data' className='md:w-[80%] sm:w-full' onSubmit={handleSubmit}>
+                    <form action="" encType='multipart/form-data' className='md:w-[80%] sm:w-full w-full' onSubmit={handleSubmit}>
                         <div className='flex flex-col mb-3'>
                             <label htmlFor="email">Email</label>
                             <input type="text" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" id='email' name='email' className='py-2 rounded-md text-black px-4' required value={email} onChange={(e) => setEmail(e.target.value)} />

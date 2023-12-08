@@ -12,6 +12,7 @@ function UserNFTs(props) {
   useEffect(() => {
       const fetchData = async () => {
         try{
+          setLoading(true);
           const nfts = await ApiService.getUserNFTs(props?.accounts[0]);
           setUserNfts(nfts.data.data);
           setLoading(false);
@@ -23,15 +24,12 @@ function UserNFTs(props) {
       fetchData();
   }, [props.accounts]);
 
-  console.log(props.accounts);
-
   return (
     <>
 
-      <div className='mt-8 grid lg:grid-cols-4 gap-3 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 px-4 '>
+      <div className='mt-8 flex flex-wrap gap-4 justify-center md:justify-start lg:gap-10 md:gap-6 px-4 '>
         {!props.web3 && !props.accounts ? "Fetching Data...." :
           userNfts?.length < 1 ? "you do not have any nfts.." : userNfts?.map((item, index) => {
-            console.log(item);
             return (
               <UserNFT
                 key={index}

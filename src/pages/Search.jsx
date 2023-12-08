@@ -35,9 +35,7 @@ function Search() {
       .then((contractInstance) => {
         if (contractInstance) {
           // Contract initialized successfully
-          // console.log("Contract initialized.");
           setContract(contractInstance)
-
         } else {
           // Handle the case when the contract could not be initialized
           console.log("Failed to initialize contract.");
@@ -60,9 +58,7 @@ function Search() {
         console.log(err);
       }
     }
-
     fetchData();
-
   }, [])
   // console.log(categories);
 
@@ -87,7 +83,6 @@ function Search() {
           // Contract initialized successfully
           console.log("Contract initialized.");
           setContract(contractInstance)
-
         } else {
           // Handle the case when the contract could not be initialized
           console.log("Failed to initialize contract.");
@@ -108,8 +103,6 @@ function Search() {
         from: accounts[0],
         value: price
       });
-
-      // console.log("tx", purchase);
       setLoading(false);
     }
     catch (err) {
@@ -119,7 +112,7 @@ function Search() {
 
   const handleSearchNFt = async (e) => {
     e.preventDefault();
-    try{
+    try {
       if (name.trim() === "") {
         return;
       }
@@ -129,7 +122,7 @@ function Search() {
       setNfts(data.data.data);
       setLoading(false);
     }
-    catch(err){
+    catch (err) {
       console.log(err);
     }
   }
@@ -144,9 +137,7 @@ function Search() {
     display: "block",
   };
   return (
-
     <>
-      {/* <div className='relative w-full flex justify-center z-100'> */}
       <MoonLoader
         color={"#ffffff"}
         loading={loading}
@@ -168,30 +159,28 @@ function Search() {
         pauseOnHover
         theme="dark"
       />
-      <div className='search flex justify-center gap-5'>
-        <div className="">
-          <form action="" onSubmit={handleSearchNFt}>
-            <input className='px-2 py-1 rounded-sm w-[400px]' style={{ color: "black" }} type="text" placeholder='Search for NFT' name='search' value={name} onChange={(e) => setName(e.target.value)} />
-            <button type='submit' className='btn-primary px-2 py-1 rounded-sm'>Search</button>
-          </form>
-        </div>
-        <div className="dropdown">
-          <button className="dropbtn px-3 py-1">Categories</button>
-          <div className="dropdown-content">
-            {
-              categories.map((category, index) => {
-                return (
-                  <p onClick={() => filterByCategory(category)}>{category}</p>
-                )
-              })
-            }
+      <form action="" onSubmit={handleSearchNFt} className='sm:flex sm:gap-4 sm:justify-center px-4'>
+        <input className='px-2 py-1 rounded-sm w-full sm:w-[60%]  mb-3' style={{ color: "black" }} type="text" placeholder='Search for NFT' name='search' value={name} onChange={(e) => setName(e.target.value)} />
+        <div className="flex justify-between sm:block ">
+          <button type='submit' className='btn-primary px-2 py-1 rounded-sm sm:mx-4'>Search</button>
+          <div className="dropdown">
+            <button className="dropbtn px-3 py-1">Categories</button>
+            <div className="dropdown-content">
+              {
+                categories.map((category, index) => {
+                  return (
+                    <p className=' cursor-pointer' onClick={() => filterByCategory(category)}>{category}</p>
+                  )
+                })
+              }
+            </div>
           </div>
         </div>
-      </div>
+      </form>
 
-      <div className="nfts px-6 mt-20">
+
+      <div className="nfts px-6 mt-20 flex flex-wrap sm:gap-8">
         {nfts?.map((item, index) => {
-          {/* console.log(item) */ }
           return (
             <>
               {!item?.isListedForAuction ?

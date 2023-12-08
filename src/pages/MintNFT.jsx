@@ -10,7 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ApiService from './../services/ApiServices';
 
 import { CSSProperties } from "react";
-import MoonLoader from "react-spinners/MoonLoader";
+import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 
 import { io } from "socket.io-client";
 
@@ -25,8 +25,8 @@ function MintNFT() {
     // const [imageDownloadUrl, setImageDownloadUrl] = useState(""); 
     const [contract, setContract] = useState();
     let [loading, setLoading] = useState(false);
-    const [web3, setWeb3] = useState(); 
-    const [accounts, setAccounts] = useState(); 
+    const [web3, setWeb3] = useState();
+    const [accounts, setAccounts] = useState();
 
 
     let imageName;
@@ -39,18 +39,18 @@ function MintNFT() {
                 toast.error("please login first");
                 return;
             }
-            if(!web3){
-                alert("Please install metaMask first"); 
+            if (!web3) {
+                alert("Please install metaMask first");
                 return;
             }
             e.preventDefault();
             // Upload image to firebase and get the image url...
-            if(!contract){
-                toast.error("Please login into metamask first"); 
-                return; 
+            if (!contract) {
+                toast.error("Please login into metamask first");
+                return;
             }
 
-            if(!ethAccounts){
+            if (!ethAccounts) {
                 toast.error("Please Login into metamask");
                 return
             }
@@ -69,7 +69,7 @@ function MintNFT() {
             toast.success("Confirming Transactin...");
 
             // get accounts  
-            
+
             console.log(contract);
             setLoading(true);
 
@@ -94,20 +94,20 @@ function MintNFT() {
 
                     console.log("Data to be sent to the server : ", data);
                     ApiService.addNFT(data)
-                    .then(saveNFTData => {
-                        if (saveNFTData.status === 200) {
-                            console.log("NFT SAVED...");
-                        }
-                        else {
-                            console.log("NFT not saved")
+                        .then(saveNFTData => {
+                            if (saveNFTData.status === 200) {
+                                console.log("NFT SAVED...");
+                            }
+                            else {
+                                console.log("NFT not saved")
 
-                        }
-                        console.log('result : ', executeMint);
-                        navigate("/profile"); 
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    });
+                            }
+                            console.log('result : ', executeMint);
+                            navigate("/profile");
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
                 })
                 .catch(err => {
                     console.log(err);
@@ -121,26 +121,26 @@ function MintNFT() {
     useEffect(() => {
         // Initialize web3...
         initWeb3()
-        .then(web3Instance => {
-            console.log(web3Instance); 
-            setWeb3(web3Instance); 
-            const fetchAccounts = async () => {
-                try{
-                    if(web3Instance){
-                        setAccounts(await web3Instance?.eth?.getAccounts()); 
+            .then(web3Instance => {
+                console.log(web3Instance);
+                setWeb3(web3Instance);
+                const fetchAccounts = async () => {
+                    try {
+                        if (web3Instance) {
+                            setAccounts(await web3Instance?.eth?.getAccounts());
+                        }
+
                     }
-                   
+                    catch (err) {
+                        console.log(err);
+                    }
                 }
-                catch(err){
-                    console.log(err);
-                }
-            }
-            fetchAccounts();
-        })
-        .catch(err => {
-            console.log(err); 
-        }); 
-        
+                fetchAccounts();
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
         // initialize contract
         initContract()
             .then((contractInstance) => {
@@ -167,22 +167,26 @@ function MintNFT() {
     }, []);
 
     const override = {
-        margin: "0 auto",
-        borderColor: "blue",
-        position: "absolute",
-        top: "50%",
-        marginLeft: "auto",
-        display: "block",
+        width: '100%',
+        margin: '0 auto',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)', // Center the loader
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 50,
     };
 
     return (
         <>
             <div className='relative w-full flex justify-center'>
-                <MoonLoader
+                <ClimbingBoxLoader
                     color={"#ffffff"}
                     loading={loading}
                     cssOverride={override}
-                    size={60}
+                    size={20}
                     aria-label="Loading Spinner"
                     data-testid="loader"
                 />
@@ -201,7 +205,7 @@ function MintNFT() {
             />
 
             <section id='MintNFT' className='px-8 mt-16'>
-                <div className='flex justify-center border-white border-2 flex-col items-center md:w-[40%] xs:w-[80%] xs:px-4 md:px-0 mx-auto py-8 rounded-lg'>
+                <div className='flex justify-center border-white border-2 flex-col items-center md:w-[60%] lg:w-[40%] sm:w-[60%] sm:px-4 mx-auto py-8 rounded-lg'>
                     <h2 className='text-3xl font-semibold mb-8 text-center'>Mint NFT</h2>
                     <form action="" encType='multipart/form-data' className='md:w-[80%] sm:w-full' onSubmit={handleSubmit}>
                         <div className='mb-3 flex flex-col'>

@@ -99,7 +99,7 @@ function User(props) {
 
   // console.log("web3 : ", web3, "contract : ", contract, "accounts : ", accounts);
   return (
-    <>
+    <div className='overflow-y-auto'>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -124,7 +124,7 @@ function User(props) {
         />
       </div>
 
-      <section id='User' className='px-4 flex gap-4'>
+      <section id='User' className='px-4 flex flex-wrap justify-center md:justify-start gap-4'>
         <p className='bg-[#000] px-3 py-2 inline-block rounded-md font-semibold text-lg'>My Information</p>
         <p className='bg-[#000] px-3 py-2 inline-block rounded-md'>{userData?.username}</p>
         <p className='bg-[#000] px-3 py-2 inline-block rounded-md'>{userData?.email}</p>
@@ -139,7 +139,7 @@ function User(props) {
           />
       }
       <UserTx />
-    </>
+    </div>
   )
 }
 

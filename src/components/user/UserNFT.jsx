@@ -21,8 +21,6 @@ function UserNFT(props) {
         const now = new Date().getTime();
         const endTimestamp = endTime * 1000; // Convert seconds to milliseconds
         const remainingTime = endTimestamp - now;
-        // console.log(remainingTime);
-        // if(remainingTime > 0)
         return remainingTime
     };
 
@@ -31,7 +29,6 @@ function UserNFT(props) {
     e.preventDefault();
     try {
       setLoading(true);
-    //   const fetchAccounts = await props.web3.eth.getAccounts();
       let auctionDurationInSeconds = Number(auctionDuration) * 3600;
       if (auctionDuration < 1) {
         return window.alert("Please Enter hours greater than or equal to 1");
@@ -73,7 +70,6 @@ function UserNFT(props) {
     const price = prompt("Enter the Price for the NFT");
     try {
       setLoading(true);
-    //   const getMetaMaskAccounts = await props.web3.eth.getAccounts();
 
       props.contract.methods.sellNFT(index, web3Utils.toWei(Number(price), "ether")).send({
         from: props.accounts[0],
@@ -97,6 +93,7 @@ function UserNFT(props) {
         })
         .catch(err => {
           console.log(err);
+          setLoading(false);
         });
     }
     catch (err) {
@@ -106,8 +103,6 @@ function UserNFT(props) {
   }
 
   const removeFromSale = async (tokenIndex) => {
-    // console.log(tokenIndex);
-    console.log(props.accounts);
     setLoading(true);
     try {
       let confirm = window.confirm("Are you sure you want to Remove it from sale");
@@ -172,6 +167,7 @@ function UserNFT(props) {
           saveTransaction();
         })
         .catch(err => {
+          setLoading(false);
           console.log(err)
           toast.error(err.message);
           return;
@@ -179,6 +175,7 @@ function UserNFT(props) {
 
     }
     catch (err) {
+      setLoading(false)
       console.log(err);
     }
   }
@@ -186,8 +183,7 @@ function UserNFT(props) {
     return (
         <>
             {toggleAuctionForm &&
-
-                <div className="modal top-[30%] absolute w-[100%] flex justify-center ">
+                <div className="modal top-[30%] absolute w-[100%] flex justify-center shadow-md">
                     <form action="" className='px-6 w-[300px] py-3 rounded-md' onSubmit={handleInitiateAuction}>
                         <h3 className='text-center mb-4'>Auction</h3>
                         <div className='mb- flex flex-col w-full'>
@@ -207,9 +203,7 @@ function UserNFT(props) {
                     </form>
                 </div>
             }
-
-
-            <div key={props.index} className='card col-span-1 bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6'>
+            <div key={props.index} className={`card col-span-1 bg-[#343444] w-[320px] rounded-lg px-4 py-2 shadow-sm shadow-[#79279F] my-6 ${toggleAuctionForm && 'opacity-40'}`}>
                 {/* <p className='break-words'>Owner: {props[0]}</p> */}
                 <p>name : {props?.name}</p>
                 <p className='break-words'>Description : {props?.description}</p>

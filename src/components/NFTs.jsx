@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { CSSProperties } from "react";
-import MoonLoader from "react-spinners/MoonLoader";
+import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 
 import NFT from './NFT';
 import ApiService from './../services/ApiServices';
@@ -70,11 +70,11 @@ function NFTs() {
   };
   return (
     <>
-      <MoonLoader
+      <ClimbingBoxLoader
         color={"#ffffff"}
         loading={loading}
         cssOverride={override}
-        size={60}
+        size={20}
         aria-label="Loading Spinner"
         data-testid="loader"
       />
@@ -93,7 +93,7 @@ function NFTs() {
       />
 
 
-      <div className='flex justify-between relative'>
+      <div className={`flex justify-between relative ${loading && 'opacity-40'}`}>
         {nfts?.length > 0 ?
           <h3 className='text-xl font-bold mb-4'>NFTs</h3>
           :
@@ -109,7 +109,7 @@ function NFTs() {
       </div>
 
 
-      <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1 gap-3'>
+      <div className={`flex flex-wrap md:justify-start justify-center gap-8 ${loading && 'opacity-40'}`}>
         {nfts?.map((item, index) => {
           return (
             <NFT

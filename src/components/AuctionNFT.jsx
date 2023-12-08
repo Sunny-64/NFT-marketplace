@@ -16,7 +16,6 @@ function AuctionNFT(props) {
     const [contract, setContract] = useState({});
     const [accounts, setAccounts] = useState([]);
     const [web3, setWeb3] = useState({});
-    // console.log(props.endTime);
     useEffect(() => {
         // set web3...
         initWeb3()

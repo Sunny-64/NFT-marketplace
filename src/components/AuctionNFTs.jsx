@@ -114,7 +114,7 @@ function AuctionNFTs() {
                             </div>
                         </div>
                     </div>
-                    <div className='grid lg:grid-cols-4 md:grid-cols-3 md:place-content-center sm:place-content-center sm:grid-cols-2 xs:grid-cols-1'>
+                    <div className={`flex flex-wrap md:justify-start justify-center gap-8 ${loading && 'opacity-40'}`}>
                         {
                             auctions?.map((item, index) => {
                                 return getRemainingTime(item.endTime) > 0 &&
