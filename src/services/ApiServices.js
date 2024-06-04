@@ -1,7 +1,7 @@
 import axios from "axios";
 // export const BASE_URL = "https://fine-red-pronghorn-toga.cyclic.app";
 // export const BASE_URL = "https://1c5e-2401-4900-1c6e-db00-c913-6e63-1b42-429e.ngrok-free.app"
-export const BASE_URL = "https://marketplace-backend-h2kw.onrender.com/";
+export const BASE_URL = "https://marketplace-backend-h2kw.onrender.com";
 // const TOKEN = localStorage.getItem("TOKEN") ?? sessionStorage.getItem("TOKEN");
 // console.log("Token in service file : ", TOKEN);
 const getAuthToken = () => {
